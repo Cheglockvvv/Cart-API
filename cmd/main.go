@@ -3,5 +3,5 @@ package main
 import "Cart-API/internal/repository"
 
 func main() {
-	repository.PostgresCartRepo{}
+	repository.PostgresCart{}
 }
