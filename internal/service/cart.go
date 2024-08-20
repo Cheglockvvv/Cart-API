@@ -13,3 +13,36 @@ type CartRepository interface {
 type Cart struct {
 	cartRepository CartRepository
 }
+
+func (service *Cart) NewCart() (string, error) {
+	id, err := service.cartRepository.CreateCart()
+	if err != nil {
+		return "", err
+	}
+	return id, nil
+}
+
+func (service *Cart) GetCartByID(id string) (*models.Cart, error) {
+	cart, err := service.cartRepository.GetCartByID(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return cart, nil
+}
+
+func (service *Cart) AddItemToCart(cartID, name string, quantity int) (string, error) {
+	itemID, err := service.cartRepository.AddItemToCart(cartID, name, quantity)
+
+	if err != nil {
+		return "", err
+	}
+
+	return itemID, nil
+}
+
+func (service *Cart) RemoveItemFromCart(cartID, itemID string) error {
+	err := service.cartRepository.RemoveItemFromCart(cartID, itemID)
+	return err
+}
