@@ -9,7 +9,7 @@ import (
 
 type CartService interface {
 	CreateCart() (string, error)
-	GetCartByID(cartID string) (*models.Cart, error)
+	GetCartByID(cartID string) (models.Cart, error)
 	AddItemToCart(cartID, name string, quantity int) (string, error)
 	RemoveItemFromCart(cartID, itemID string) error
 }
@@ -42,12 +42,12 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&parsedBody)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	itemID, err := c.cartService.AddItemToCart(cartID, parsedBody.Name, parsedBody.Quantity)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	parsedBody.CartID = cartID
@@ -56,7 +56,7 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(parsedBody)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -66,14 +66,14 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 
 	err := c.cartService.RemoveItemFromCart(cartID, itemID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write([]byte("{}"))
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -82,14 +82,14 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	cart, err := c.cartService.GetCartByID(id)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(cart)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 

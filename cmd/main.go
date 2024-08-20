@@ -20,7 +20,7 @@ func main() {
 	cartHandler := handler.NewHandler(cartService)
 
 	mux := http.NewServeMux()
-	mux.Handle("/cart/{id}", cartHandler)
+	mux.Handle("POST /cart/{id}", cartHandler)
 	mux.HandleFunc("lksgjaslg", cartHandler.CreateCart)
 
 	http.ListenAndServe(":8080", mux)
