@@ -1,6 +1,9 @@
 package handler
 
-import "Cart-API/internal/models"
+import (
+	"Cart-API/internal/models"
+	"net/http"
+)
 
 type CartService interface {
 	CreateCart() (string, error)
@@ -11,4 +14,11 @@ type CartService interface {
 
 type Cart struct {
 	cartService CartService
+}
+
+func (c *Cart) HelloWorld(w http.ResponseWriter, r *http.Request) {
+	_, err := w.Write([]byte("Hello World"))
+	if err != nil {
+		return
+	}
 }
