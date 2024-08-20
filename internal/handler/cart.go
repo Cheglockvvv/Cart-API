@@ -48,6 +48,14 @@ func (c *Cart) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		c.AddItemToCart(w, r)
 		return
 	case r.Method == http.MethodDelete && CartRemove.MatchString(r.URL.Path):
-		c.
+		c.RemoveItemFromCart(w, r)
+		return
+	case r.Method == http.MethodGet && CartView.MatchString(r.URL.Path):
+		c.GetCartByID(w, r)
+		return
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		w.Write([]byte(http.StatusText(http.StatusMethodNotAllowed)))
+		return
 	}
 }
