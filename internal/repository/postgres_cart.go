@@ -3,6 +3,7 @@ package repository
 import (
 	"Cart-API/internal/models"
 	"fmt"
+	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -11,7 +12,7 @@ type PostgresCart struct {
 }
 
 func (r *PostgresCart) Init(connectionString string) error {
-	db, err := sqlx.Connect("postgres", connectionString)
+	db, err := sqlx.Connect("pgx", connectionString)
 	if err != nil {
 		return fmt.Errorf("sqlx.Connect: %w", err)
 	}
@@ -43,11 +44,15 @@ func (r *PostgresCart) GetCartByID(id string) (models.Cart, error) {
 	}
 	defer rows.Close()
 
+	if !rows.Next() {
+		return models.Cart{}, nil
+	}
+
 	cart := models.Cart{ID: id}
 	items := make([]models.CartItem, 0)
 
 	for rows.Next() {
-		var row models.CartItem
+		row := models.CartItem{}
 		err = rows.StructScan(&row)
 
 		if err != nil {
@@ -56,15 +61,30 @@ func (r *PostgresCart) GetCartByID(id string) (models.Cart, error) {
 		items = append(items, row)
 	}
 
+	cart.Items = items
 	return cart, nil
 }
 
 func (r *PostgresCart) AddItemToCart(cartID, name string, quantity int) (string, error) {
+	const check = `SELECT id FROM cart WHERE id = $1`
+	result, err := r.DB.Exec(check, cartID)
+	if err != nil {
+		return "", fmt.Errorf("r.DB.Exec: %w", err)
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return "", fmt.Errorf("result.RowsAffected: %w", err)
+	}
+
+	if count != 1 {
+		return "", fmt.Errorf("cart not found")
+	}
+
 	const query = `INSERT INTO cart_item (cart_id, name, quantity)
 								VALUES ($1, $2, $3)
 								RETURNING id`
 	var itemID string
-	err := r.DB.QueryRowx(query, cartID, name, quantity).Scan(&itemID)
+	err = r.DB.QueryRowx(query, cartID, name, quantity).Scan(&itemID)
 
 	if err != nil {
 		return "", fmt.Errorf("r.DB.QueryRowx: %w", err)
@@ -74,12 +94,38 @@ func (r *PostgresCart) AddItemToCart(cartID, name string, quantity int) (string,
 }
 
 func (r *PostgresCart) RemoveItemFromCart(cartID, itemID string) error {
+
+	const checkCart = `SELECT id FROM cart WHERE id = $1`
+	result, err := r.DB.Exec(checkCart, cartID)
+	if err != nil {
+		return fmt.Errorf("r.DB.Exec: %w", err)
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("result.RowsAffected: %w", err)
+	}
+
+	if count != 1 {
+		return fmt.Errorf("cart not found")
+	}
+
+	const checkItem = `SELECT id FROM cart_item WHERE id = $1`
+	result, err = r.DB.Exec(checkItem, itemID)
+	if err != nil {
+		return fmt.Errorf("r.DB.Exec: %w", err)
+	}
+	count, err = result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("result.RowsAffected: %w", err)
+	}
+
+	if count != 1 {
+		return fmt.Errorf("item not found")
+	}
+
 	const query = `DELETE FROM cart_item WHERE cart_id = $1 AND id = $2`
 
-	err := r.DB.QueryRowx(query, cartID, itemID)
-	if err != nil {
-		return fmt.Errorf("r.DB.QueryRowx: %w", err)
-	}
+	r.DB.QueryRowx(query, cartID, itemID)
 
 	return nil
 }
