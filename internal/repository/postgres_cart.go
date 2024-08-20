@@ -4,23 +4,16 @@ import (
 	"Cart-API/internal/models"
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"log"
 )
 
 type PostgresCart struct {
 	DB *sqlx.DB
 }
 
-func (r *PostgresCart) Init(dataSourceName string) error {
-	db, err := sqlx.Connect("postgres", dataSourceName)
-
+func (r *PostgresCart) Init(connectionString string) error {
+	db, err := sqlx.Connect("postgres", connectionString)
 	if err != nil {
-		return err
-	}
-
-	err = db.Ping()
-	if err != nil {
-		return err
+		return fmt.Errorf("sqlx.Connect: %w", err)
 	}
 
 	r.DB = db
@@ -28,64 +21,64 @@ func (r *PostgresCart) Init(dataSourceName string) error {
 }
 
 func (r *PostgresCart) CreateCart() (string, error) {
-	const createCartQuery = `INSERT INTO cart VALUES (DEFAULT) RETURNING id`
+	const query = `INSERT INTO cart VALUES (DEFAULT) RETURNING id`
 
 	var id string
-	err := r.DB.QueryRowx(createCartQuery).Scan(&id)
+	err := r.DB.QueryRowx(query).Scan(&id)
 	if err != nil {
-		return "", fmt.Errorf("failed to create a cart: %w", err)
+		return "", fmt.Errorf("r.DB.QueryRowx.Scan: %w", err)
 	}
-
-	log.Println(id)
 
 	return id, nil
 }
 
-func (r *PostgresCart) GetCartByID(id string) (*models.Cart, error) {
-	const getCartByIDQuery = `SELECT ci.id, ci.cart_id, ci.name, ci.quantity FROM cart_item ci WHERE ci.cart_id = $1`
-	rows, err := r.DB.Queryx(getCartByIDQuery, id)
+func (r *PostgresCart) GetCartByID(id string) (models.Cart, error) {
+	const query = `SELECT ci.id, ci.cart_id, ci.name, ci.quantity 
+								FROM cart_item ci 
+								WHERE ci.cart_id = $1`
+
+	rows, err := r.DB.Queryx(query, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get cart items: %w", err)
+		return models.Cart{}, fmt.Errorf("r.DB.Queryx: %w", err)
 	}
 	defer rows.Close()
 
-	cart := &models.Cart{ID: id}
+	cart := models.Cart{ID: id}
 	items := make([]models.CartItem, 0)
 
 	for rows.Next() {
 		var row models.CartItem
-		rErr := rows.StructScan(&row)
+		err = rows.StructScan(&row)
 
-		if rErr != nil {
-			return nil, fmt.Errorf("failed to scan row: %w", rErr)
+		if err != nil {
+			return models.Cart{}, fmt.Errorf("rows.StructScan: %w", err)
 		}
 		items = append(items, row)
-
-		log.Printf("ID: %s, cart_ID: %s, name: %s, quantity: %d\n",
-			row.ID, row.CartID, row.Name, row.Quantity)
 	}
 
 	return cart, nil
 }
 
 func (r *PostgresCart) AddItemToCart(cartID, name string, quantity int) (string, error) {
-	const addItemToCartQuery = `INSERT INTO cart_item (cart_id, name, quantity) VALUES ($1, $2, $3) RETURNING id`
+	const query = `INSERT INTO cart_item (cart_id, name, quantity)
+								VALUES ($1, $2, $3)
+								RETURNING id`
 	var itemID string
-	err := r.DB.QueryRowx(addItemToCartQuery, cartID, name, quantity).Scan(&itemID)
+	err := r.DB.QueryRowx(query, cartID, name, quantity).Scan(&itemID)
 
 	if err != nil {
-		return "", fmt.Errorf("failed to add item to cart: %w", err)
+		return "", fmt.Errorf("r.DB.QueryRowx: %w", err)
 	}
 
 	return itemID, nil
 }
 
 func (r *PostgresCart) RemoveItemFromCart(cartID, itemID string) error {
-	const removeItemFromCartQuery = `DELETE FROM cart_item WHERE cart_id = $1 AND id = $2`
-	err := r.DB.QueryRowx(removeItemFromCartQuery, cartID, itemID)
+	const query = `DELETE FROM cart_item WHERE cart_id = $1 AND id = $2`
 
+	err := r.DB.QueryRowx(query, cartID, itemID)
 	if err != nil {
-		return fmt.Errorf("failed to remove item from cart: %w", err)
+		return fmt.Errorf("r.DB.QueryRowx: %w", err)
 	}
 
 	return nil

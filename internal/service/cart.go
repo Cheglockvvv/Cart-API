@@ -1,11 +1,13 @@
 package service
 
-import "Cart-API/internal/models"
+import (
+	"Cart-API/internal/models"
+	"fmt"
+)
 
 type CartRepository interface {
-	Init(dataSourceName string) error
 	CreateCart() (string, error)
-	GetCartByID(id string) (*models.Cart, error)
+	GetCartByID(id string) (models.Cart, error)
 	AddItemToCart(cartID, name string, quantity int) (string, error)
 	RemoveItemFromCart(cartID, itemID string) error
 }
@@ -14,39 +16,41 @@ type Cart struct {
 	cartRepository CartRepository
 }
 
-func NewService(repository CartRepository) *Cart {
+func NewCart(repository CartRepository) *Cart {
 	return &Cart{cartRepository: repository}
 }
 
-func (service *Cart) CreateCart() (string, error) {
-	id, err := service.cartRepository.CreateCart()
+func (c *Cart) CreateCart() (string, error) {
+	id, err := c.cartRepository.CreateCart()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("c.cartRepository.CreateCart: %w", err)
 	}
 	return id, nil
 }
 
-func (service *Cart) GetCartByID(id string) (*models.Cart, error) {
-	cart, err := service.cartRepository.GetCartByID(id)
-
+func (c *Cart) GetCartByID(id string) (models.Cart, error) {
+	cart, err := c.cartRepository.GetCartByID(id)
 	if err != nil {
-		return nil, err
+		return models.Cart{}, fmt.Errorf("c.cartRepository.GetCartByID: %w", err)
 	}
 
 	return cart, nil
 }
 
-func (service *Cart) AddItemToCart(cartID, name string, quantity int) (string, error) {
-	itemID, err := service.cartRepository.AddItemToCart(cartID, name, quantity)
-
+func (c *Cart) AddItemToCart(cartID, name string, quantity int) (string, error) {
+	itemID, err := c.cartRepository.AddItemToCart(cartID, name, quantity)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("c.cartRepository.AddItemToCart: %w", err)
 	}
 
 	return itemID, nil
 }
 
-func (service *Cart) RemoveItemFromCart(cartID, itemID string) error {
-	err := service.cartRepository.RemoveItemFromCart(cartID, itemID)
-	return err
+func (c *Cart) RemoveItemFromCart(cartID, itemID string) error {
+	err := c.cartRepository.RemoveItemFromCart(cartID, itemID)
+	if err != nil {
+		return fmt.Errorf("c.cartRepository.RemoveItemFromCart: %w", err)
+	}
+
+	return nil
 }

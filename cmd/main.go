@@ -15,12 +15,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cartService := service.NewService(&cartRepository)
+	cartService := service.NewCart(&cartRepository)
 
 	cartHandler := handler.NewHandler(cartService)
 
 	mux := http.NewServeMux()
-	mux.Handle("/cart", cartHandler)
+	mux.Handle("/cart/{id}", cartHandler)
+	mux.HandleFunc("lksgjaslg", cartHandler.CreateCart)
 
 	http.ListenAndServe(":8080", mux)
 }

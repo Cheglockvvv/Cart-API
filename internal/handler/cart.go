@@ -2,6 +2,7 @@ package handler
 
 import (
 	"Cart-API/internal/models"
+	"encoding/json"
 	"net/http"
 	"regexp"
 )
@@ -21,41 +22,85 @@ func NewHandler(cartService CartService) *Cart {
 	return &Cart{cartService: cartService}
 }
 
-func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {}
+func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
+	cartID, err := c.cartService.CreateCart()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 
-func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {}
+	cart := models.Cart{ID: cartID, Items: []models.CartItem{}}
+	err = json.NewEncoder(w).Encode(cart)
 
-func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {}
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
+	cartID := r.PathValue("id")
+	var parsedBody models.CartItem
+	err := json.NewDecoder(r.Body).Decode(&parsedBody)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	itemID, err := c.cartService.AddItemToCart(cartID, parsedBody.Name, parsedBody.Quantity)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	parsedBody.CartID = cartID
+	parsedBody.ID = itemID
+
+	err = json.NewEncoder(w).Encode(parsedBody)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+}
+
+func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
+	cartID := r.PathValue("cartID")
+	itemID := r.PathValue("itemID")
+
+	err := c.cartService.RemoveItemFromCart(cartID, itemID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write([]byte("{}"))
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+}
 
 func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	cart, err := c.cartService.GetCartByID(id)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(cart)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
 }
 
 func (c *Cart) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var (
-		CartCreate = regexp.MustCompile(`^/cart/*$`)
-		CartAdd    = regexp.MustCompile(`^/cart/[0-9]+/items/*$`)
-		CartRemove = regexp.MustCompile(`^/cart/[0-9]+/items/[0-9]+/*$`)
-		CartView   = regexp.MustCompile(`^/cart/[0-9]+/*$`)
-	)
+	w.Header().Set("Content-Type", "application/json")
 
-	switch {
-	case r.Method == http.MethodPost && CartCreate.MatchString(r.URL.Path):
-		c.CreateCart(w, r)
-		return
-	case r.Method == http.MethodPost && CartAdd.MatchString(r.URL.Path):
-		c.AddItemToCart(w, r)
-		return
-	case r.Method == http.MethodDelete && CartRemove.MatchString(r.URL.Path):
-		c.RemoveItemFromCart(w, r)
-		return
-	case r.Method == http.MethodGet && CartView.MatchString(r.URL.Path):
-		c.GetCartByID(w, r)
-		return
-	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		w.Write([]byte(http.StatusText(http.StatusMethodNotAllowed)))
-		return
-	}
 }
+
+var (
+	CartCreate = regexp.MustCompile(`^/cart/*$`)
+	CartAdd    = regexp.MustCompile(`^/cart/[0-9]+/items/*$`)
+	CartRemove = regexp.MustCompile(`^/cart/[0-9]+/items/[0-9]+/*$`)
+	CartView   = regexp.MustCompile(`^/cart/[0-9]+/*$`)
+)
