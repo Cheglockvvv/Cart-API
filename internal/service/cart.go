@@ -14,7 +14,7 @@ type Cart struct {
 	cartRepository CartRepository
 }
 
-func (service *Cart) NewCart() (string, error) {
+func (service *Cart) CreateCart() (string, error) {
 	id, err := service.cartRepository.CreateCart()
 	if err != nil {
 		return "", err
