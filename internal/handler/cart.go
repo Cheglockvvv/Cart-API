@@ -37,12 +37,23 @@ func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
+	cartAdd := regexp.MustCompile(`^/cart/[0-9]+/items/*$`)
+	if !cartAdd.MatchString(r.URL.Path) {
+		http.Error(w, "id is required", http.StatusBadRequest)
+	}
+
 	cartID := r.PathValue("id")
 	var parsedBody models.CartItem
 	err := json.NewDecoder(r.Body).Decode(&parsedBody)
-
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	switch {
+	case parsedBody.Quantity < 0:
+		http.Error(w, "positive quantity is required", http.StatusBadRequest)
+	case parsedBody.Name == "":
+		http.Error(w, "non-empty name is required", http.StatusBadRequest)
 	}
 
 	itemID, err := c.cartService.AddItemToCart(cartID, parsedBody.Name, parsedBody.Quantity)
@@ -61,6 +72,11 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
+	cartRemove := regexp.MustCompile(`^/cart/[0-9]+/items/[0-9]+/*$`)
+	if !cartRemove.MatchString(r.URL.Path) {
+		http.Error(w, "cartID and itemID are required", http.StatusBadRequest)
+	}
+
 	cartID := r.PathValue("cartID")
 	itemID := r.PathValue("itemID")
 
@@ -78,6 +94,11 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
+	cartView := regexp.MustCompile(`^/cart/[0-9]+/*$`)
+	if !cartView.MatchString(r.URL.Path) {
+		http.Error(w, "id is required", http.StatusBadRequest)
+	}
+
 	id := r.PathValue("id")
 	cart, err := c.cartService.GetCartByID(id)
 
@@ -97,10 +118,3 @@ func (c *Cart) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 }
-
-var (
-	CartCreate = regexp.MustCompile(`^/cart/*$`)
-	CartAdd    = regexp.MustCompile(`^/cart/[0-9]+/items/*$`)
-	CartRemove = regexp.MustCompile(`^/cart/[0-9]+/items/[0-9]+/*$`)
-	CartView   = regexp.MustCompile(`^/cart/[0-9]+/*$`)
-)
