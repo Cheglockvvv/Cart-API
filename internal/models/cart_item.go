@@ -3,6 +3,6 @@ package models
 type CartItem struct {
 	ID       string
 	CartID   string
-	Product  string
+	Name     string
 	Quantity int
 }
