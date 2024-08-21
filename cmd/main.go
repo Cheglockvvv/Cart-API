@@ -1,17 +1,27 @@
 package main
 
 import (
+	"Cart-API/config"
 	"Cart-API/internal/handler"
 	"Cart-API/internal/repository"
 	"Cart-API/internal/service"
+	"fmt"
 	"log"
 	"net/http"
 )
 
 func main() {
+	cfg, err := config.LoadEnv()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	const DSN = "postgres://%s:%s@%s:%s/%s?sslmode=%s"
+	filledDsn := fmt.Sprintf(DSN, cfg.DB.User, cfg.DB.Password, cfg.DB.Host, cfg.DB.Port,
+		cfg.DB.DBName, cfg.DB.SSLMode)
+
 	cartRepository := repository.PostgresCart{}
-	err := cartRepository.Init(
-		"postgres://postgres:418032@localhost:5432/postgres?sslmode=disable")
+	err = cartRepository.Init(filledDsn)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -25,7 +35,7 @@ func main() {
 	mux.HandleFunc("DELETE /cart/{cartID}/items/{itemID}", cartHandler.RemoveItemFromCart)
 	mux.HandleFunc("GET /cart/{id}", cartHandler.GetCartByID)
 
-	err = http.ListenAndServe(":8080", mux)
+	err = http.ListenAndServe(fmt.Sprintf(":%s", cfg.API.Port), mux)
 	if err != nil {
 		log.Fatal(err)
 	}
