@@ -2,7 +2,7 @@ package models
 
 type CartItem struct {
 	ID       string
-	CartID   string `db:"cart_id"`
+	CartID   string
 	Name     string
 	Quantity int
 }
