@@ -7,6 +7,13 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type cartItem struct {
+	ID       string `db:"id"`
+	CartID   string `db:"cart_id"`
+	Name     string `db:"name"`
+	Quantity int    `db:"quantity"`
+}
+
 type PostgresCart struct {
 	DB *sqlx.DB
 }
@@ -49,10 +56,12 @@ func (r *PostgresCart) GetCartByID(id string) (models.Cart, error) {
 	}
 
 	cart := models.Cart{ID: id}
-	items := make([]models.CartItem, 0)
+
+	//TODO: change struct
+	items := make([]cartItem, 0)
 
 	for rows.Next() {
-		row := models.CartItem{}
+		row := cartItem{}
 		err = rows.StructScan(&row)
 
 		if err != nil {
@@ -61,7 +70,12 @@ func (r *PostgresCart) GetCartByID(id string) (models.Cart, error) {
 		items = append(items, row)
 	}
 
-	cart.Items = items
+	convertedItems := make([]models.CartItem, len(items))
+	for i := range items {
+		convertedItems[i] = modelConvert(items[i])
+	}
+
+	cart.Items = convertedItems
 	return cart, nil
 }
 
@@ -128,4 +142,15 @@ func (r *PostgresCart) RemoveItemFromCart(cartID, itemID string) error {
 	r.DB.QueryRowx(query, cartID, itemID)
 
 	return nil
+}
+
+func modelConvert(item cartItem) models.CartItem {
+	modelItem := models.CartItem{
+		ID:       item.ID,
+		CartID:   item.CartID,
+		Name:     item.Name,
+		Quantity: item.Quantity,
+	}
+
+	return modelItem
 }
