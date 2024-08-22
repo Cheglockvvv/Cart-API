@@ -17,6 +17,7 @@ FROM alpine AS runner
 
 COPY --from=builder /usr/local/src/bin/app /
 COPY --from=builder /usr/local/src/.env /
+COPY --from=builder /usr/local/src/app/internal/db/migrations /migrations
 
 EXPOSE ${API_PORT}
 
