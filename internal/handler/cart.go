@@ -131,8 +131,3 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
-
-func (c *Cart) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
-}
