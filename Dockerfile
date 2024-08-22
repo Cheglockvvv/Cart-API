@@ -1,16 +1,13 @@
-FROM golang:alpine
+FROM golang:1.23-alpine
 LABEL authors="cheglockvvv"
 
-WORKDIR /app
+WORKDIR /usr/local/src
 
-COPY . .
+RUN apk --no-cache add bash
 
-RUN go get -d -v ./...
+# dependencies
+COPY ["go.mod", "go.sum", "./"]
+RUN go mod download
 
-RUN go build -o app cmd/main.go
+# build
 
-EXPOSE 8080
-
-CMD ["./app"]
-
-ENTRYPOINT ["top", "-b"]
