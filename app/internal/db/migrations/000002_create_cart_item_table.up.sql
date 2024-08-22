@@ -3,5 +3,5 @@ CREATE TABLE IF NOT EXISTS cart_item (
     cart_id BIGINT NOT NULL,
     name VARCHAR(128) NOT NULL,
     quantity BIGINT NOT NULL,
-    FOREIGN KEY (id) REFERENCES cart (id)
+    FOREIGN KEY (cart_id) REFERENCES cart (id)
 );

@@ -12,7 +12,7 @@ import (
 func Up(db *sqlx.DB) error {
 	m, err := initMigrator(db)
 	if err != nil {
-		return fmt.Errorf("initMigrator")
+		return fmt.Errorf("initMigrator: %w", err)
 	}
 	m.Up()
 
@@ -22,7 +22,7 @@ func Up(db *sqlx.DB) error {
 func Down(db *sqlx.DB) error {
 	m, err := initMigrator(db)
 	if err != nil {
-		return fmt.Errorf("initMigrator")
+		return fmt.Errorf("initMigrator: %w", err)
 	}
 	m.Down()
 
@@ -32,15 +32,15 @@ func Down(db *sqlx.DB) error {
 func initMigrator(db *sqlx.DB) (*migrate.Migrate, error) {
 	driver, err := postgres.WithInstance(db.DB, &postgres.Config{})
 	if err != nil {
-		return nil, fmt.Errorf("postgres.WithInstance")
+		return nil, fmt.Errorf("postgres.WithInstance: %w", err)
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://.",
+		":file///app/internal/db/migrations",
 		"postgres", driver)
 
 	if err != nil {
-		return nil, fmt.Errorf("migrate.NewWithDatabaseInstance")
+		return nil, fmt.Errorf("migrate.NewWithDatabaseInstance: %w", err)
 	}
 
 	return m, nil
