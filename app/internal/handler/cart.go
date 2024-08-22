@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"Cart-API/internal/models"
+	models2 "Cart-API/app/internal/models"
 	"encoding/json"
 	"net/http"
 	"regexp"
@@ -9,7 +9,7 @@ import (
 
 type CartService interface {
 	CreateCart() (string, error)
-	GetCartByID(cartID string) (models.Cart, error)
+	GetCartByID(cartID string) (models2.Cart, error)
 	AddItemToCart(cartID, name string, quantity int) (string, error)
 	RemoveItemFromCart(cartID, itemID string) error
 }
@@ -29,7 +29,7 @@ func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cart := models.Cart{ID: cartID, Items: []models.CartItem{}}
+	cart := models2.Cart{ID: cartID, Items: []models2.CartItem{}}
 	err = json.NewEncoder(w).Encode(cart)
 
 	if err != nil {
@@ -46,7 +46,7 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cartID := r.PathValue("id")
-	var parsedBody models.CartItem
+	var parsedBody models2.CartItem
 	err := json.NewDecoder(r.Body).Decode(&parsedBody)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
