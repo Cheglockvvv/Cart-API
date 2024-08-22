@@ -1,10 +1,11 @@
 package main
 
 import (
+	"Cart-API/app/config"
+	"Cart-API/app/internal/db/migrations"
 	"Cart-API/app/internal/handler"
 	"Cart-API/app/internal/repository"
 	"Cart-API/app/internal/service"
-	"Cart-API/config"
 	"fmt"
 	"log"
 	"net/http"
@@ -22,6 +23,11 @@ func main() {
 
 	cartRepository := repository.PostgresCart{}
 	err = cartRepository.Init(filledDsn)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = migrations.Up(cartRepository.DB)
 	if err != nil {
 		log.Fatal(err)
 	}
