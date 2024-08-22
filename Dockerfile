@@ -16,5 +16,8 @@ RUN go build -o ./bin/app app/cmd/main.go
 FROM alpine AS runner
 
 COPY --from=builder /usr/local/src/bin/app /
+COPY --from=builder /usr/local/src/.env /
+
+EXPOSE ${API_PORT}
 
 CMD ["/app"]
