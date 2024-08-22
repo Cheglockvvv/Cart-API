@@ -1,7 +1,7 @@
 package service
 
 import (
-	"Cart-API/internal/models"
+	"Cart-API/app/internal/models"
 	"fmt"
 )
 

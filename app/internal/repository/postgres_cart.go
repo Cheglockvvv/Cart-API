@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"Cart-API/internal/models"
+	models2 "Cart-API/app/internal/models"
 	"fmt"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
@@ -40,22 +40,22 @@ func (r *PostgresCart) CreateCart() (string, error) {
 	return id, nil
 }
 
-func (r *PostgresCart) GetCartByID(id string) (models.Cart, error) {
+func (r *PostgresCart) GetCartByID(id string) (models2.Cart, error) {
 	const query = `SELECT ci.id, ci.cart_id, ci.name, ci.quantity 
 								FROM cart_item ci 
 								WHERE ci.cart_id = $1`
 
 	rows, err := r.DB.Queryx(query, id)
 	if err != nil {
-		return models.Cart{}, fmt.Errorf("r.DB.Queryx: %w", err)
+		return models2.Cart{}, fmt.Errorf("r.DB.Queryx: %w", err)
 	}
 	defer rows.Close()
 
 	if !rows.Next() {
-		return models.Cart{}, nil
+		return models2.Cart{}, nil
 	}
 
-	cart := models.Cart{ID: id}
+	cart := models2.Cart{ID: id}
 
 	//TODO: change struct
 	items := make([]cartItem, 0)
@@ -65,12 +65,12 @@ func (r *PostgresCart) GetCartByID(id string) (models.Cart, error) {
 		err = rows.StructScan(&row)
 
 		if err != nil {
-			return models.Cart{}, fmt.Errorf("rows.StructScan: %w", err)
+			return models2.Cart{}, fmt.Errorf("rows.StructScan: %w", err)
 		}
 		items = append(items, row)
 	}
 
-	convertedItems := make([]models.CartItem, len(items))
+	convertedItems := make([]models2.CartItem, len(items))
 	for i := range items {
 		convertedItems[i] = modelConvert(items[i])
 	}
@@ -144,8 +144,8 @@ func (r *PostgresCart) RemoveItemFromCart(cartID, itemID string) error {
 	return nil
 }
 
-func modelConvert(item cartItem) models.CartItem {
-	modelItem := models.CartItem{
+func modelConvert(item cartItem) models2.CartItem {
+	modelItem := models2.CartItem{
 		ID:       item.ID,
 		CartID:   item.CartID,
 		Name:     item.Name,

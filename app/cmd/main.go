@@ -1,10 +1,10 @@
 package main
 
 import (
-	"Cart-API/config"
-	"Cart-API/internal/handler"
-	"Cart-API/internal/repository"
-	"Cart-API/internal/service"
+	"Cart-API/app/config"
+	"Cart-API/app/internal/handler"
+	"Cart-API/app/internal/repository"
+	"Cart-API/app/internal/service"
 	"fmt"
 	"log"
 	"net/http"
