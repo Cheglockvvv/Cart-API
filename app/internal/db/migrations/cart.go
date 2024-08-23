@@ -36,7 +36,7 @@ func initMigrator(db *sqlx.DB) (*migrate.Migrate, error) {
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		":file///app/internal/db/migrations",
+		"file:///migrations",
 		"postgres", driver)
 
 	if err != nil {
