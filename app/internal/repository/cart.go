@@ -14,36 +14,36 @@ type cartItem struct {
 	Quantity int    `db:"quantity"`
 }
 
-type PostgresCart struct {
+type Cart struct {
 	DB *sqlx.DB
 }
 
-func (r *PostgresCart) Init(connectionString string) error {
+func (c *Cart) Init(connectionString string) error {
 	db, err := sqlx.Connect("pgx", connectionString)
 	if err != nil {
 		return fmt.Errorf("sqlx.Connect: %w", err)
 	}
 
-	r.DB = db
+	c.DB = db
 	return nil
 }
 
-func (r *PostgresCart) CreateCart() (string, error) {
+func (c *Cart) CreateCart() (string, error) {
 	const query = `INSERT INTO cart VALUES (DEFAULT) RETURNING id`
 
 	var id string
-	err := r.DB.QueryRowx(query).Scan(&id)
+	err := c.DB.QueryRowx(query).Scan(&id)
 	if err != nil {
-		return "", fmt.Errorf("r.DB.QueryRowx.Scan: %w", err)
+		return "", fmt.Errorf("c.DB.QueryRowx.Scan: %w", err)
 	}
 
 	return id, nil
 }
 
-func (r *PostgresCart) GetCartByID(id string) (models.Cart, error) {
-	ok, err := r.cartIsAvailable(id)
+func (c *Cart) GetCartByID(id string) (models.Cart, error) {
+	ok, err := c.cartIsAvailable(id)
 	if err != nil {
-		return models.Cart{}, fmt.Errorf("r.cartIsAvailable: %w", err)
+		return models.Cart{}, fmt.Errorf("c.cartIsAvailable: %w", err)
 	}
 
 	if !ok {
@@ -53,9 +53,9 @@ func (r *PostgresCart) GetCartByID(id string) (models.Cart, error) {
 								FROM cart_item ci 
 								WHERE ci.cart_id = $1`
 
-	rows, err := r.DB.Queryx(query, id)
+	rows, err := c.DB.Queryx(query, id)
 	if err != nil {
-		return models.Cart{}, fmt.Errorf("r.DB.Queryx: %w", err)
+		return models.Cart{}, fmt.Errorf("c.DB.Queryx: %w", err)
 	}
 	defer rows.Close()
 
@@ -82,11 +82,11 @@ func (r *PostgresCart) GetCartByID(id string) (models.Cart, error) {
 	return cart, nil
 }
 
-func (r *PostgresCart) AddItemToCart(cartID, name string, quantity int) (models.CartItem, error) {
+func (c *Cart) AddItemToCart(cartID, name string, quantity int) (models.CartItem, error) {
 
-	ok, err := r.cartIsAvailable(cartID)
+	ok, err := c.cartIsAvailable(cartID)
 	if err != nil {
-		return models.CartItem{}, fmt.Errorf("r.cartIsAvailable: %w", err)
+		return models.CartItem{}, fmt.Errorf("c.cartIsAvailable: %w", err)
 	}
 
 	if !ok {
@@ -100,25 +100,25 @@ func (r *PostgresCart) AddItemToCart(cartID, name string, quantity int) (models.
 								    EXCLUDED.quantity
 								RETURNING id`
 	var itemID string
-	err = r.DB.QueryRowx(query, cartID, name, quantity).Scan(&itemID)
+	err = c.DB.QueryRowx(query, cartID, name, quantity).Scan(&itemID)
 
 	if err != nil {
-		return models.CartItem{}, fmt.Errorf("r.DB.QueryRowx: %w", err)
+		return models.CartItem{}, fmt.Errorf("c.DB.QueryRowx: %w", err)
 	}
 
-	item, err := r.GetItem(itemID)
+	item, err := c.GetItem(itemID)
 	if err != nil {
-		return models.CartItem{}, fmt.Errorf("r.GetItem: %w", err)
+		return models.CartItem{}, fmt.Errorf("c.GetItem: %w", err)
 	}
 
 	return item, nil
 }
 
-func (r *PostgresCart) RemoveItemFromCart(cartID, itemID string) error {
+func (c *Cart) RemoveItemFromCart(cartID, itemID string) error {
 
-	ok, err := r.cartIsAvailable(cartID)
+	ok, err := c.cartIsAvailable(cartID)
 	if err != nil {
-		return fmt.Errorf("r.cartIsAvailable: %w", err)
+		return fmt.Errorf("c.cartIsAvailable: %w", err)
 	}
 
 	if !ok {
@@ -126,9 +126,9 @@ func (r *PostgresCart) RemoveItemFromCart(cartID, itemID string) error {
 	}
 
 	const checkItem = `SELECT id FROM cart_item WHERE id = $1`
-	result, err := r.DB.Exec(checkItem, itemID)
+	result, err := c.DB.Exec(checkItem, itemID)
 	if err != nil {
-		return fmt.Errorf("r.DB.Exec: %w", err)
+		return fmt.Errorf("c.DB.Exec: %w", err)
 	}
 	count, err := result.RowsAffected()
 	if err != nil {
@@ -141,17 +141,18 @@ func (r *PostgresCart) RemoveItemFromCart(cartID, itemID string) error {
 
 	const query = `DELETE FROM cart_item WHERE cart_id = $1 AND id = $2`
 
-	r.DB.QueryRowx(query, cartID, itemID)
+	//TODO: switch to Exec
+	c.DB.QueryRowx(query, cartID, itemID)
 
 	return nil
 }
 
-func (r *PostgresCart) cartIsAvailable(id string) (bool, error) {
+func (c *Cart) cartIsAvailable(id string) (bool, error) {
 
 	const checkCart = `SELECT id FROM cart WHERE id = $1`
-	result, err := r.DB.Exec(checkCart, id)
+	result, err := c.DB.Exec(checkCart, id)
 	if err != nil {
-		return false, fmt.Errorf("r.DB.Exec: %w", err)
+		return false, fmt.Errorf("c.DB.Exec: %w", err)
 	}
 	count, err := result.RowsAffected()
 	if err != nil {
@@ -165,11 +166,11 @@ func (r *PostgresCart) cartIsAvailable(id string) (bool, error) {
 	return true, nil
 }
 
-func (r *PostgresCart) GetItem(id string) (models.CartItem, error) {
+func (c *Cart) GetItem(id string) (models.CartItem, error) {
 	const query = `SELECT ci.id, ci.cart_id, ci.name, ci.quantity 
 								FROM cart_item ci 
 								WHERE ci.id = $1`
-	result := r.DB.QueryRowx(query, id)
+	result := c.DB.QueryRowx(query, id)
 	item := cartItem{}
 	err := result.StructScan(&item)
 	if err != nil {

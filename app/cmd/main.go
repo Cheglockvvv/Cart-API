@@ -21,7 +21,7 @@ func main() {
 	filledDsn := fmt.Sprintf(DSN, cfg.DB.User, cfg.DB.Password, cfg.DB.Host, cfg.DB.Port,
 		cfg.DB.DBName, cfg.DB.SSLMode)
 
-	cartRepository := repository.PostgresCart{}
+	cartRepository := repository.Cart{}
 	err = cartRepository.Init(filledDsn)
 	if err != nil {
 		log.Fatal(err)
