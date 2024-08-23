@@ -55,10 +55,10 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 
 	switch {
 	case parsedBody.Quantity <= 0:
-		http.Error(w, "positive quantity is required", http.StatusBadRequest)
+		http.Error(w, "positive quantity is required", http.StatusUnprocessableEntity)
 		return
 	case parsedBody.Name == "":
-		http.Error(w, "non-empty name is required", http.StatusBadRequest)
+		http.Error(w, "non-empty name is required", http.StatusUnprocessableEntity)
 		return
 	}
 
