@@ -27,6 +27,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	//err = migrations.Down(cartRepository.DB)
 	err = migrations.Up(cartRepository.DB)
 	if err != nil {
 		log.Fatal(err)
