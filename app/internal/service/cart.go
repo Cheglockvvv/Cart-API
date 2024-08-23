@@ -8,7 +8,7 @@ import (
 type CartRepository interface {
 	CreateCart() (string, error)
 	GetCartByID(id string) (models.Cart, error)
-	AddItemToCart(cartID, name string, quantity int) (string, error)
+	AddItemToCart(cartID, name string, quantity int) (models.CartItem, error)
 	RemoveItemFromCart(cartID, itemID string) error
 }
 
@@ -37,13 +37,13 @@ func (c *Cart) GetCartByID(id string) (models.Cart, error) {
 	return cart, nil
 }
 
-func (c *Cart) AddItemToCart(cartID, name string, quantity int) (string, error) {
-	itemID, err := c.cartRepository.AddItemToCart(cartID, name, quantity)
+func (c *Cart) AddItemToCart(cartID, name string, quantity int) (models.CartItem, error) {
+	item, err := c.cartRepository.AddItemToCart(cartID, name, quantity)
 	if err != nil {
-		return "", fmt.Errorf("c.cartRepository.AddItemToCart: %w", err)
+		return item, fmt.Errorf("c.cartRepository.AddItemToCart: %w", err)
 	}
 
-	return itemID, nil
+	return item, nil
 }
 
 func (c *Cart) RemoveItemFromCart(cartID, itemID string) error {

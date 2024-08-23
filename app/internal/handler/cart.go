@@ -1,7 +1,7 @@
 package handler
 
 import (
-	models2 "Cart-API/app/internal/models"
+	models "Cart-API/app/internal/models"
 	"encoding/json"
 	"net/http"
 	"regexp"
@@ -9,8 +9,8 @@ import (
 
 type CartService interface {
 	CreateCart() (string, error)
-	GetCartByID(cartID string) (models2.Cart, error)
-	AddItemToCart(cartID, name string, quantity int) (string, error)
+	GetCartByID(cartID string) (models.Cart, error)
+	AddItemToCart(cartID, name string, quantity int) (models.CartItem, error)
 	RemoveItemFromCart(cartID, itemID string) error
 }
 
@@ -29,7 +29,7 @@ func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cart := models2.Cart{ID: cartID, Items: []models2.CartItem{}}
+	cart := models.Cart{ID: cartID, Items: []models.CartItem{}}
 	err = json.NewEncoder(w).Encode(cart)
 
 	if err != nil {
@@ -46,7 +46,7 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cartID := r.PathValue("id")
-	var parsedBody models2.CartItem
+	var parsedBody models.CartItem
 	err := json.NewDecoder(r.Body).Decode(&parsedBody)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -62,16 +62,13 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	itemID, err := c.cartService.AddItemToCart(cartID, parsedBody.Name, parsedBody.Quantity)
+	item, err := c.cartService.AddItemToCart(cartID, parsedBody.Name, parsedBody.Quantity)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	parsedBody.CartID = cartID
-	parsedBody.ID = itemID
-
-	err = json.NewEncoder(w).Encode(parsedBody)
+	err = json.NewEncoder(w).Encode(item)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
