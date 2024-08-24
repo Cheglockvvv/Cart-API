@@ -25,7 +25,7 @@ func NewHandler(cartService CartService) *Cart {
 func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
 	cartID, err := c.cartService.CreateCart()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 
@@ -33,7 +33,7 @@ func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(cart)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 }
@@ -41,7 +41,7 @@ func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
 func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	cartAdd := regexp.MustCompile(`^/cart/[0-9]+/items/*$`)
 	if !cartAdd.MatchString(r.URL.Path) {
-		http.Error(w, "id is required", http.StatusBadRequest)
+		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
 
@@ -49,29 +49,29 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	var parsedBody models.CartItem
 	err := json.NewDecoder(r.Body).Decode(&parsedBody)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 
 	switch {
 	case parsedBody.Quantity <= 0:
-		http.Error(w, "positive quantity is required", http.StatusUnprocessableEntity)
+		http.Error(w, "", http.StatusUnprocessableEntity)
 		return
 	case parsedBody.Name == "":
-		http.Error(w, "non-empty name is required", http.StatusUnprocessableEntity)
+		http.Error(w, "", http.StatusUnprocessableEntity)
 		return
 	}
 
 	item, err := c.cartService.AddItemToCart(cartID, parsedBody.Name, parsedBody.Quantity)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 
 	err = json.NewEncoder(w).Encode(item)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 }
@@ -79,7 +79,7 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 	cartRemove := regexp.MustCompile(`^/cart/[0-9]+/items/[0-9]+/*$`)
 	if !cartRemove.MatchString(r.URL.Path) {
-		http.Error(w, "cartID and itemID are required", http.StatusBadRequest)
+		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
 
@@ -88,7 +88,7 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 
 	err := c.cartService.RemoveItemFromCart(cartID, itemID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 
@@ -96,14 +96,14 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 	_, err = w.Write([]byte("{}"))
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "", http.StatusInternalServerError)
 	}
 }
 
 func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	cartView := regexp.MustCompile(`^/cart/[0-9]+/*$`)
 	if !cartView.MatchString(r.URL.Path) {
-		http.Error(w, "id is required", http.StatusBadRequest)
+		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
 
@@ -111,12 +111,12 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	cart, err := c.cartService.GetCartByID(id)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 
 	if cart.ID == "" {
-		http.Error(w, "cart does not exist", http.StatusNotFound)
+		http.Error(w, "", http.StatusNotFound)
 		return
 	}
 
@@ -124,7 +124,7 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(cart)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 }
