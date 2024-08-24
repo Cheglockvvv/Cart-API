@@ -116,7 +116,7 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if cart.ID == "" {
-		http.Error(w, "", http.StatusNotFound)
+		http.Error(w, "", http.StatusUnprocessableEntity)
 		return
 	}
 
