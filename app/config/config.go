@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"github.com/joho/godotenv"
 	"os"
 )
 
@@ -25,10 +24,6 @@ type Cart struct {
 }
 
 func LoadEnv() (*Cart, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return nil, fmt.Errorf("godotenv.Load")
-	}
 
 	requiredEnvs := []string{
 		"DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME", "DB_PORT", "API_PORT", "DB_SSLMODE"}
