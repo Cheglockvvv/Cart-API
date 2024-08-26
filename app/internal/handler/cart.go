@@ -57,12 +57,12 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	case parsedBody.Quantity <= 0:
 		http.Error(w, "", http.StatusUnprocessableEntity)
 		return
-	case parsedBody.Name == "":
+	case parsedBody.Product == "":
 		http.Error(w, "", http.StatusUnprocessableEntity)
 		return
 	}
 
-	item, err := c.cartService.AddItemToCart(cartID, parsedBody.Name, parsedBody.Quantity)
+	item, err := c.cartService.AddItemToCart(cartID, parsedBody.Product, parsedBody.Quantity)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
