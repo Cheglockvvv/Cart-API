@@ -141,7 +141,7 @@ func (c *Cart) CartIsAvailable(id string) (bool, error) {
 	return true, nil
 }
 
-func (c *Cart) GetItem(id string) (models.CartItem, error) {
+func (c *Cart) GetItemByID(id string) (models.CartItem, error) {
 	const query = `SELECT ci.id, ci.cart_id, ci.name, ci.quantity 
 								FROM cart_item ci 
 								WHERE ci.id = $1`
