@@ -8,7 +8,7 @@ import (
 type CartRepository interface {
 	CreateCart() (string, error)
 	GetCartByID(id string) (models.Cart, error)
-	AddItemToCart(cartID, name string, quantity int) (models.CartItem, error)
+	AddItemToCart(cartID, name string, quantity int) (string, error)
 	RemoveItemFromCart(cartID, itemID string) error
 	CartIsAvailable(id string) (bool, error)
 	GetItemByID(id string) (models.CartItem, error)
