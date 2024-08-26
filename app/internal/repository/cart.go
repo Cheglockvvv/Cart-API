@@ -41,14 +41,6 @@ func (c *Cart) CreateCart() (string, error) {
 }
 
 func (c *Cart) GetCartByID(id string) (models.Cart, error) {
-	ok, err := c.cartIsAvailable(id)
-	if err != nil {
-		return models.Cart{}, fmt.Errorf("c.cartIsAvailable: %w", err)
-	}
-
-	if !ok {
-		return models.Cart{}, fmt.Errorf("cart not found")
-	}
 	const query = `SELECT ci.id, ci.cart_id, ci.name, ci.quantity 
 								FROM cart_item ci 
 								WHERE ci.cart_id = $1`
@@ -84,15 +76,6 @@ func (c *Cart) GetCartByID(id string) (models.Cart, error) {
 
 func (c *Cart) AddItemToCart(cartID, name string, quantity int) (models.CartItem, error) {
 
-	ok, err := c.cartIsAvailable(cartID)
-	if err != nil {
-		return models.CartItem{}, fmt.Errorf("c.cartIsAvailable: %w", err)
-	}
-
-	if !ok {
-		return models.CartItem{}, fmt.Errorf("cart not found")
-	}
-
 	const query = `INSERT INTO cart_item (cart_id, name, quantity)
 								VALUES ($1, $2, $3)
 								ON CONFLICT (cart_id, name)
@@ -100,7 +83,7 @@ func (c *Cart) AddItemToCart(cartID, name string, quantity int) (models.CartItem
 								    EXCLUDED.quantity
 								RETURNING id`
 	var itemID string
-	err = c.DB.QueryRowx(query, cartID, name, quantity).Scan(&itemID)
+	err := c.DB.QueryRowx(query, cartID, name, quantity).Scan(&itemID)
 
 	if err != nil {
 		return models.CartItem{}, fmt.Errorf("c.DB.QueryRowx: %w", err)
@@ -115,16 +98,6 @@ func (c *Cart) AddItemToCart(cartID, name string, quantity int) (models.CartItem
 }
 
 func (c *Cart) RemoveItemFromCart(cartID, itemID string) error {
-
-	ok, err := c.cartIsAvailable(cartID)
-	if err != nil {
-		return fmt.Errorf("c.cartIsAvailable: %w", err)
-	}
-
-	if !ok {
-		return fmt.Errorf("cart not found")
-	}
-
 	const checkItem = `SELECT id FROM cart_item WHERE id = $1`
 	result, err := c.DB.Exec(checkItem, itemID)
 	if err != nil {
@@ -149,7 +122,7 @@ func (c *Cart) RemoveItemFromCart(cartID, itemID string) error {
 	return nil
 }
 
-func (c *Cart) cartIsAvailable(id string) (bool, error) {
+func (c *Cart) CartIsAvailable(id string) (bool, error) {
 
 	const checkCart = `SELECT id FROM cart WHERE id = $1`
 	result, err := c.DB.Exec(checkCart, id)
