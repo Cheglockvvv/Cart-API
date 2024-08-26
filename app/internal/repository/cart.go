@@ -7,7 +7,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type cartItem struct {
+type cartItemEntity struct {
 	ID       string `db:"id"`
 	CartID   string `db:"cart_id"`
 	Product  string `db:"product"`
@@ -53,10 +53,10 @@ func (c *Cart) GetCartByID(id string) (models.Cart, error) {
 
 	cart := models.Cart{ID: id}
 
-	items := make([]cartItem, 0)
+	items := make([]cartItemEntity, 0)
 
 	for rows.Next() {
-		row := cartItem{}
+		row := cartItemEntity{}
 		err = rows.StructScan(&row)
 
 		if err != nil {
@@ -146,7 +146,7 @@ func (c *Cart) GetItem(id string) (models.CartItem, error) {
 								FROM cart_item ci 
 								WHERE ci.id = $1`
 	result := c.DB.QueryRowx(query, id)
-	item := cartItem{}
+	item := cartItemEntity{}
 	err := result.StructScan(&item)
 	if err != nil {
 		return models.CartItem{}, fmt.Errorf("result.StructScan: %w", err)
@@ -157,7 +157,7 @@ func (c *Cart) GetItem(id string) (models.CartItem, error) {
 	return convertedItem, nil
 }
 
-func cartItemConvert(item cartItem) models.CartItem {
+func cartItemConvert(item cartItemEntity) models.CartItem {
 	modelItem := models.CartItem{
 		ID:       item.ID,
 		CartID:   item.CartID,
