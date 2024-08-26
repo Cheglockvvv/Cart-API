@@ -10,7 +10,7 @@ import (
 type cartItem struct {
 	ID       string `db:"id"`
 	CartID   string `db:"cart_id"`
-	Name     string `db:"name"`
+	Product  string `db:"product"`
 	Quantity int    `db:"quantity"`
 }
 
@@ -75,7 +75,7 @@ func (c *Cart) GetCartByID(id string) (models.Cart, error) {
 
 	convertedItems := make([]models.CartItem, len(items))
 	for i := range items {
-		convertedItems[i] = CartItemConvert(items[i])
+		convertedItems[i] = cartItemConvert(items[i])
 	}
 
 	cart.Items = convertedItems
@@ -177,16 +177,16 @@ func (c *Cart) GetItem(id string) (models.CartItem, error) {
 		return models.CartItem{}, fmt.Errorf("result.StructScan: %w", err)
 	}
 
-	convertedItem := CartItemConvert(item)
+	convertedItem := cartItemConvert(item)
 
 	return convertedItem, nil
 }
 
-func CartItemConvert(item cartItem) models.CartItem {
+func cartItemConvert(item cartItem) models.CartItem {
 	modelItem := models.CartItem{
 		ID:       item.ID,
 		CartID:   item.CartID,
-		Name:     item.Name,
+		Product:  item.Product,
 		Quantity: item.Quantity,
 	}
 
