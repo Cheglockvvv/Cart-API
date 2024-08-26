@@ -24,7 +24,6 @@ type Cart struct {
 }
 
 func LoadEnv() (*Cart, error) {
-
 	requiredEnvs := []string{
 		"DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME", "DB_PORT", "API_PORT", "DB_SSLMODE"}
 
