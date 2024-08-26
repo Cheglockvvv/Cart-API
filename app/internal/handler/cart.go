@@ -125,7 +125,7 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	cart, err := c.cartService.GetCartByID(id)
 
 	if err != nil {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -140,7 +140,7 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(convertedCart)
 
 	if err != nil {
-		http.Error(w, "", http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }

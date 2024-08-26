@@ -8,15 +8,15 @@ import (
 )
 
 type cartItemEntity struct {
-	id       string `db:"id"`
-	cartID   string `db:"cart_id"`
-	product  string `db:"product"`
-	quantity int    `db:"quantity"`
+	ID       string `db:"id"`
+	CartID   string `db:"cart_id"`
+	Product  string `db:"product"`
+	Quantity int    `db:"quantity"`
 }
 
 type cartEntity struct {
-	id    string           `db:"id"`
-	items []cartItemEntity `db:"items"`
+	ID    string           `db:"id"`
+	Items []cartItemEntity `db:"items"`
 }
 
 type Cart struct {
