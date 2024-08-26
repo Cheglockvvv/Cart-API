@@ -8,3 +8,6 @@ type CartItemRepository interface {
 	RemoveItemFromCart(cartID, itemID string) error
 	ItemIsAvailable(id string) (bool, error)
 }
+
+type CartItem struct {
+}
