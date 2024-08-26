@@ -46,7 +46,7 @@ func (c *Cart) CreateCart() (string, error) {
 }
 
 func (c *Cart) GetCartByID(id string) (models.Cart, error) {
-	const query = `SELECT ci.id, ci.cart_id, ci.name, ci.quantity 
+	const query = `SELECT ci.id, ci.cart_id, ci.product, ci.quantity 
 								FROM cart_item ci 
 								WHERE ci.cart_id = $1`
 
@@ -81,9 +81,9 @@ func (c *Cart) GetCartByID(id string) (models.Cart, error) {
 
 func (c *Cart) AddItemToCart(cartID, name string, quantity int) (string, error) {
 
-	const query = `INSERT INTO cart_item (cart_id, name, quantity)
+	const query = `INSERT INTO cart_item (cart_id, product, quantity)
 								VALUES ($1, $2, $3)
-								ON CONFLICT (cart_id, name)
+								ON CONFLICT (cart_id, product)
 								DO UPDATE SET quantity = cart_item.quantity +
 								    EXCLUDED.quantity
 								RETURNING id`
@@ -146,7 +146,7 @@ func (c *Cart) ItemIsAvailable(id string) (bool, error) {
 }
 
 func (c *Cart) GetItemByID(id string) (models.CartItem, error) {
-	const query = `SELECT ci.id, ci.cart_id, ci.name, ci.quantity 
+	const query = `SELECT ci.id, ci.cart_id, ci.product, ci.quantity 
 								FROM cart_item ci 
 								WHERE ci.id = $1`
 	result := c.DB.QueryRowx(query, id)
