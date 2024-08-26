@@ -8,15 +8,15 @@ import (
 )
 
 type cartItemEntity struct {
-	ID       string `db:"id"`
-	CartID   string `db:"cart_id"`
-	Product  string `db:"product"`
-	Quantity int    `db:"quantity"`
+	id       string `db:"id"`
+	cartID   string `db:"cart_id"`
+	product  string `db:"product"`
+	quantity int    `db:"quantity"`
 }
 
 type cartEntity struct {
-	ID    string           `db:"id"`
-	Items []cartItemEntity `db:"items"`
+	id    string           `db:"id"`
+	items []cartItemEntity `db:"items"`
 }
 
 type Cart struct {
@@ -56,7 +56,7 @@ func (c *Cart) GetCartByID(id string) (models.Cart, error) {
 	}
 	defer rows.Close()
 
-	cartEn := cartEntity{ID: id}
+	cartEn := cartEntity{id: id}
 
 	items := make([]cartItemEntity, 0)
 
@@ -75,7 +75,7 @@ func (c *Cart) GetCartByID(id string) (models.Cart, error) {
 		convertedItems[i] = cartItemConvert(items[i])
 	}
 
-	cart := models.Cart{ID: cartEn.ID, Items: convertedItems}
+	cart := models.Cart{ID: cartEn.id, Items: convertedItems}
 	return cart, nil
 }
 
@@ -163,10 +163,10 @@ func (c *Cart) GetItemByID(id string) (models.CartItem, error) {
 
 func cartItemConvert(item cartItemEntity) models.CartItem {
 	modelItem := models.CartItem{
-		ID:       item.ID,
-		CartID:   item.CartID,
-		Product:  item.Product,
-		Quantity: item.Quantity,
+		ID:       item.id,
+		CartID:   item.cartID,
+		Product:  item.product,
+		Quantity: item.quantity,
 	}
 
 	return modelItem
