@@ -79,7 +79,7 @@ func (c *Cart) GetCartByID(id string) (models.Cart, error) {
 	return cart, nil
 }
 
-func (c *Cart) AddItemToCart(cartID, name string, quantity int) (models.CartItem, error) {
+func (c *Cart) AddItemToCart(cartID, name string, quantity int) (string, error) {
 
 	const query = `INSERT INTO cart_item (cart_id, name, quantity)
 								VALUES ($1, $2, $3)
@@ -91,15 +91,10 @@ func (c *Cart) AddItemToCart(cartID, name string, quantity int) (models.CartItem
 	err := c.DB.QueryRowx(query, cartID, name, quantity).Scan(&itemID)
 
 	if err != nil {
-		return models.CartItem{}, fmt.Errorf("c.DB.QueryRowx: %w", err)
+		return "", fmt.Errorf("c.DB.QueryRowx: %w", err)
 	}
 
-	item, err := c.GetItem(itemID)
-	if err != nil {
-		return models.CartItem{}, fmt.Errorf("c.GetItem: %w", err)
-	}
-
-	return item, nil
+	return itemID, nil
 }
 
 func (c *Cart) RemoveItemFromCart(cartID, itemID string) error {
