@@ -153,6 +153,16 @@ func cartItemConvert(modelItem models.CartItem) cartItemEntity {
 	return item
 }
 
-func cartConvert(cart models.Cart) cartEntity {
+func cartConvert(modelCart models.Cart) cartEntity {
+	cartItems := make([]cartItemEntity, len(modelCart.Items))
+	for i, item := range modelCart.Items {
+		cartItems[i] = cartItemConvert(item)
+	}
 
+	cart := cartEntity{
+		ID:    modelCart.ID,
+		Items: cartItems,
+	}
+
+	return cart
 }
