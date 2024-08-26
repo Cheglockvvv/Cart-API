@@ -82,6 +82,15 @@ func (c *Cart) RemoveItemFromCart(cartID, itemID string) error {
 		return fmt.Errorf("cart is not available")
 	}
 
+	ok, err = c.cartRepository.ItemIsAvailable(itemID)
+	if err != nil {
+		return fmt.Errorf("c.cartRepository.ItemIsAvailable: %w", err)
+	}
+
+	if !ok {
+		return fmt.Errorf("cart item is not available")
+	}
+
 	err = c.cartRepository.RemoveItemFromCart(cartID, itemID)
 	if err != nil {
 		return fmt.Errorf("c.cartRepository.RemoveItemFromCart: %w", err)
