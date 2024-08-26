@@ -11,6 +11,7 @@ type CartRepository interface {
 	AddItemToCart(cartID, name string, quantity int) (models.CartItem, error)
 	RemoveItemFromCart(cartID, itemID string) error
 	CartIsAvailable(id string) (bool, error)
+	GetItemByID(id string) (models.CartItem, error)
 }
 
 type Cart struct {
