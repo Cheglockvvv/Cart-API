@@ -98,23 +98,9 @@ func (c *Cart) AddItemToCart(cartID, name string, quantity int) (string, error) 
 }
 
 func (c *Cart) RemoveItemFromCart(cartID, itemID string) error {
-	const checkItem = `SELECT id FROM cart_item WHERE id = $1`
-	result, err := c.DB.Exec(checkItem, itemID)
-	if err != nil {
-		return fmt.Errorf("c.DB.Exec: %w", err)
-	}
-	count, err := result.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("result.RowsAffected: %w", err)
-	}
-
-	if count != 1 {
-		return fmt.Errorf("item not found")
-	}
-
 	const query = `DELETE FROM cart_item WHERE cart_id = $1 AND id = $2`
 
-	_, err = c.DB.Exec(query, cartID, itemID)
+	_, err := c.DB.Exec(query, cartID, itemID)
 	if err != nil {
 		return fmt.Errorf("c.DB.Exec: %w", err)
 	}
@@ -126,6 +112,24 @@ func (c *Cart) CartIsAvailable(id string) (bool, error) {
 
 	const checkCart = `SELECT id FROM cart WHERE id = $1`
 	result, err := c.DB.Exec(checkCart, id)
+	if err != nil {
+		return false, fmt.Errorf("c.DB.Exec: %w", err)
+	}
+	count, err := result.RowsAffected()
+	if err != nil {
+		return false, fmt.Errorf("result.RowsAffected: %w", err)
+	}
+
+	if count != 1 {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func (c *Cart) ItemIsAvailable(id string) (bool, error) {
+	const checkItem = `SELECT id FROM cart_item WHERE id = $1`
+	result, err := c.DB.Exec(checkItem, id)
 	if err != nil {
 		return false, fmt.Errorf("c.DB.Exec: %w", err)
 	}
