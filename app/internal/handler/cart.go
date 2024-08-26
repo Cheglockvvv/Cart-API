@@ -81,6 +81,7 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	convertedItem := cartItemConvert(item)
+	w.Header().Set("Content-Type", "application/json")
 	err = json.NewEncoder(w).Encode(convertedItem)
 
 	if err != nil {
