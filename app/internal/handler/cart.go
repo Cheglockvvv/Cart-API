@@ -18,6 +18,13 @@ type Cart struct {
 	cartService CartService
 }
 
+type cartItemEntity struct {
+	id       string `json:"id"`
+	cartID   string `json:"cart_id"`
+	product  string `json:"product"`
+	quantity int    `json:"quantity"`
+}
+
 func NewHandler(cartService CartService) *Cart {
 	return &Cart{cartService: cartService}
 }
