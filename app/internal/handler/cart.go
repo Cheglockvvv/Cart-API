@@ -41,7 +41,7 @@ func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cart := models.Cart{ID: cartID, Items: []models.CartItem{}}
+	cart := cartEntity{ID: cartID, Items: []cartItemEntity{}}
 	err = json.NewEncoder(w).Encode(cart)
 
 	if err != nil {
