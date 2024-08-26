@@ -15,9 +15,6 @@ services:
       timeout: 2s
       retries: 3
 
-
-# add environment variables to compose
-
   app:
     build: .
     container_name: cart_api
