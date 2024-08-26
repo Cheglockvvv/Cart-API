@@ -142,13 +142,17 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func cartItemConvert(item models.CartItem) cartItemEntity {
-	modelItem := cartItemEntity{
-		ID:       item.ID,
-		CartID:   item.CartID,
-		Product:  item.Product,
-		Quantity: item.Quantity,
+func cartItemConvert(modelItem models.CartItem) cartItemEntity {
+	item := cartItemEntity{
+		ID:       modelItem.ID,
+		CartID:   modelItem.CartID,
+		Product:  modelItem.Product,
+		Quantity: modelItem.Quantity,
 	}
 
-	return modelItem
+	return item
+}
+
+func cartConvert(cart models.Cart) cartEntity {
+
 }
