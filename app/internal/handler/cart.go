@@ -133,8 +133,10 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	convertedCart := cartConvert(cart)
+
 	w.Header().Set("Content-Type", "application/json")
-	err = json.NewEncoder(w).Encode(cart)
+	err = json.NewEncoder(w).Encode(convertedCart)
 
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
