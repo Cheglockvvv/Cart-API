@@ -141,8 +141,10 @@ func (c *Cart) RemoveItemFromCart(cartID, itemID string) error {
 
 	const query = `DELETE FROM cart_item WHERE cart_id = $1 AND id = $2`
 
-	//TODO: switch to Exec
-	c.DB.QueryRowx(query, cartID, itemID)
+	_, err = c.DB.Exec(query, cartID, itemID)
+	if err != nil {
+		return fmt.Errorf("c.DB.Exec: %w", err)
+	}
 
 	return nil
 }
