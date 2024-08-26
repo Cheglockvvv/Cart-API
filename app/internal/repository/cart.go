@@ -75,7 +75,7 @@ func (c *Cart) GetCartByID(id string) (models.Cart, error) {
 
 	convertedItems := make([]models.CartItem, len(items))
 	for i := range items {
-		convertedItems[i] = modelConvert(items[i])
+		convertedItems[i] = CartItemConvert(items[i])
 	}
 
 	cart.Items = convertedItems
@@ -177,12 +177,12 @@ func (c *Cart) GetItem(id string) (models.CartItem, error) {
 		return models.CartItem{}, fmt.Errorf("result.StructScan: %w", err)
 	}
 
-	convertedItem := modelConvert(item)
+	convertedItem := CartItemConvert(item)
 
 	return convertedItem, nil
 }
 
-func modelConvert(item cartItem) models.CartItem {
+func CartItemConvert(item cartItem) models.CartItem {
 	modelItem := models.CartItem{
 		ID:       item.ID,
 		CartID:   item.CartID,
