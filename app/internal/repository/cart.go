@@ -56,7 +56,7 @@ func (c *Cart) GetCartByID(id string) (models.Cart, error) {
 	}
 	defer rows.Close()
 
-	cartEn := cartEntity{id: id}
+	cartEn := cartEntity{ID: id}
 
 	items := make([]cartItemEntity, 0)
 
@@ -75,7 +75,7 @@ func (c *Cart) GetCartByID(id string) (models.Cart, error) {
 		convertedItems[i] = cartItemConvert(items[i])
 	}
 
-	cart := models.Cart{ID: cartEn.id, Items: convertedItems}
+	cart := models.Cart{ID: cartEn.ID, Items: convertedItems}
 	return cart, nil
 }
 
@@ -163,10 +163,10 @@ func (c *Cart) GetItemByID(id string) (models.CartItem, error) {
 
 func cartItemConvert(item cartItemEntity) models.CartItem {
 	modelItem := models.CartItem{
-		ID:       item.id,
-		CartID:   item.cartID,
-		Product:  item.product,
-		Quantity: item.quantity,
+		ID:       item.ID,
+		CartID:   item.CartID,
+		Product:  item.Product,
+		Quantity: item.Quantity,
 	}
 
 	return modelItem
