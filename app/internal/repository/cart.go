@@ -14,6 +14,11 @@ type cartItemEntity struct {
 	Quantity int    `db:"quantity"`
 }
 
+type cartEntity struct {
+	ID    string           `db:"id"`
+	Items []cartItemEntity `db:"items"`
+}
+
 type Cart struct {
 	DB *sqlx.DB
 }
