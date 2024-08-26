@@ -58,7 +58,7 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cartID := r.PathValue("id")
-	var parsedBody models.CartItem
+	var parsedBody cartItemEntity
 	err := json.NewDecoder(r.Body).Decode(&parsedBody)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
@@ -80,7 +80,8 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(item)
+	convertedItem := cartItemConvert(item)
+	err = json.NewEncoder(w).Encode(convertedItem)
 
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
@@ -139,4 +140,15 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
+}
+
+func cartItemConvert(item models.CartItem) cartItemEntity {
+	modelItem := cartItemEntity{
+		ID:       item.ID,
+		CartID:   item.CartID,
+		Product:  item.Product,
+		Quantity: item.Quantity,
+	}
+
+	return modelItem
 }
