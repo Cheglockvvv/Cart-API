@@ -58,9 +58,14 @@ func (c *Cart) AddItemToCart(cartID, name string, quantity int) (models.CartItem
 		return models.CartItem{}, fmt.Errorf("cart is not available")
 	}
 
-	item, err := c.cartRepository.AddItemToCart(cartID, name, quantity)
+	itemID, err := c.cartRepository.AddItemToCart(cartID, name, quantity)
 	if err != nil {
-		return item, fmt.Errorf("c.cartRepository.AddItemToCart: %w", err)
+		return models.CartItem{}, fmt.Errorf("c.cartRepository.AddItemToCart: %w", err)
+	}
+
+	item, err := c.cartRepository.GetItemByID(itemID)
+	if err != nil {
+		return models.CartItem{}, fmt.Errorf("c.cartRepository.GetItemByID: %w", err)
 	}
 
 	return item, nil
