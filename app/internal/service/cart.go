@@ -1,6 +1,7 @@
 package service
 
 import (
+	"Cart-API/app/internal/errors"
 	"Cart-API/app/internal/models"
 	"context"
 	"fmt"
@@ -35,7 +36,7 @@ func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) 
 	}
 
 	if !ok {
-		return models.Cart{}, fmt.Errorf("cart not available")
+		return models.Cart{}, errors.ErrCartNotFound
 	}
 
 	cart, err := c.cartRepository.GetCartByID(ctx, id)
