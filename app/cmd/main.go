@@ -2,6 +2,7 @@ package main
 
 import (
 	"Cart-API/app/config"
+	"Cart-API/app/internal/db/connection"
 	"Cart-API/app/internal/db/migrations"
 	"Cart-API/app/internal/handler"
 	"Cart-API/app/internal/repository"
@@ -21,11 +22,13 @@ func main() {
 	filledDsn := fmt.Sprintf(DSN, cfg.DB.User, cfg.DB.Password, cfg.DB.Host, cfg.DB.Port,
 		cfg.DB.DBName, cfg.DB.SSLMode)
 
-	cartRepository := repository.Cart{}
-	err = cartRepository.Init(filledDsn)
+	DB, err := connection.GetConnection(DSN)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	cartRepository := repository.InitCart(DB)
+	cartItemRepository := repository.InitCartItem(DB)
 
 	//err = migrations.Down(cartRepository.DB)
 	err = migrations.Up(cartRepository.DB)
@@ -33,8 +36,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cartService := service.NewCart(&cartRepository)
-	cartHandler := handler.NewHandler(cartService)
+	cartService := service.NewCart(cartRepository)
+	cartItemService := service.NewCartItem(cartItemRepository)
+
+	cartHandler := handler.NewHandler(cartService, cartItemService)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /cart", cartHandler.CreateCart)
