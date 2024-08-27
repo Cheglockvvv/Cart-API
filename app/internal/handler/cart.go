@@ -2,19 +2,20 @@ package handler
 
 import (
 	models "Cart-API/app/internal/models"
+	"context"
 	"encoding/json"
 	"net/http"
 	"regexp"
 )
 
 type CartService interface {
-	CreateCart() (string, error)
-	GetCartByID(cartID string) (models.Cart, error)
+	CreateCart(context.Context) (string, error)
+	GetCartByID(context.Context, string) (models.Cart, error)
 }
 
 type CartItemService interface {
-	AddItemToCart(cartID, name string, quantity int) (models.CartItem, error)
-	RemoveItemFromCart(cartID, itemID string) error
+	AddItemToCart(context.Context, string, string, int) (models.CartItem, error)
+	RemoveItemFromCart(context.Context, string, string) error
 }
 
 type Cart struct {
