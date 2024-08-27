@@ -5,7 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func getConnection(connectionString string) (*sqlx.DB, error) {
+func GetConnection(connectionString string) (*sqlx.DB, error) {
 	db, err := sqlx.Connect("pgx", connectionString)
 	if err != nil {
 		return nil, fmt.Errorf("sqlx.Connect: %w", err)
