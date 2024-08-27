@@ -27,7 +27,7 @@ func (c *Cart) CreateCart(ctx context.Context) (string, error) {
 	const query = `INSERT INTO cart VALUES (DEFAULT) RETURNING id`
 
 	var id string
-	err := c.DB.QueryRowx(query).Scan(&id)
+	err := c.DB.QueryRowxContext(ctx, query).Scan(&id)
 	if err != nil {
 		return "", fmt.Errorf("c.DB.QueryRowx.Scan: %w", err)
 	}
@@ -40,7 +40,7 @@ func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) 
 								FROM cart_item ci 
 								WHERE ci.cart_id = $1`
 
-	rows, err := c.DB.Queryx(query, id)
+	rows, err := c.DB.QueryxContext(ctx, query, id)
 	if err != nil {
 		return models.Cart{}, fmt.Errorf("c.DB.Queryx: %w", err)
 	}
@@ -72,7 +72,7 @@ func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) 
 func (c *Cart) CartIsAvailable(ctx context.Context, id string) (bool, error) {
 
 	const checkCart = `SELECT id FROM cart WHERE id = $1`
-	result, err := c.DB.Exec(checkCart, id)
+	result, err := c.DB.ExecContext(ctx, checkCart, id)
 	if err != nil {
 		return false, fmt.Errorf("c.DB.Exec: %w", err)
 	}

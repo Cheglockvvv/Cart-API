@@ -33,7 +33,7 @@ func (c *CartItem) AddItemToCart(ctx context.Context, cartID, name string, quant
 								    EXCLUDED.quantity
 								RETURNING id`
 	var itemID string
-	err := c.DB.QueryRowx(query, cartID, name, quantity).Scan(&itemID)
+	err := c.DB.QueryRowxContext(ctx, query, cartID, name, quantity).Scan(&itemID)
 
 	if err != nil {
 		return "", fmt.Errorf("c.DB.QueryRowx: %w", err)
@@ -45,7 +45,7 @@ func (c *CartItem) AddItemToCart(ctx context.Context, cartID, name string, quant
 func (c *CartItem) RemoveItemFromCart(ctx context.Context, cartID, itemID string) error {
 	const query = `DELETE FROM cart_item WHERE cart_id = $1 AND id = $2`
 
-	_, err := c.DB.Exec(query, cartID, itemID)
+	_, err := c.DB.ExecContext(ctx, query, cartID, itemID)
 	if err != nil {
 		return fmt.Errorf("c.DB.Exec: %w", err)
 	}
@@ -55,7 +55,7 @@ func (c *CartItem) RemoveItemFromCart(ctx context.Context, cartID, itemID string
 
 func (c *CartItem) ItemIsAvailable(ctx context.Context, id string) (bool, error) {
 	const checkItem = `SELECT id FROM cart_item WHERE id = $1`
-	result, err := c.DB.Exec(checkItem, id)
+	result, err := c.DB.ExecContext(ctx, checkItem, id)
 	if err != nil {
 		return false, fmt.Errorf("c.DB.Exec: %w", err)
 	}
@@ -75,7 +75,7 @@ func (c *CartItem) GetItemByID(ctx context.Context, id string) (models.CartItem,
 	const query = `SELECT ci.id, ci.cart_id, ci.product, ci.quantity 
 								FROM cart_item ci 
 								WHERE ci.id = $1`
-	result := c.DB.QueryRowx(query, id)
+	result := c.DB.QueryRowxContext(ctx, query, id)
 	item := cartItemEntity{}
 	err := result.StructScan(&item)
 	if err != nil {
