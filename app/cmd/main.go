@@ -22,7 +22,7 @@ func main() {
 	filledDsn := fmt.Sprintf(DSN, cfg.DB.User, cfg.DB.Password, cfg.DB.Host, cfg.DB.Port,
 		cfg.DB.DBName, cfg.DB.SSLMode)
 
-	DB, err := connection.GetConnection(DSN)
+	DB, err := connection.GetConnection(filledDsn)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -37,7 +37,7 @@ func main() {
 	}
 
 	cartService := service.NewCart(cartRepository)
-	cartItemService := service.NewCartItem(cartItemRepository)
+	cartItemService := service.NewCartItem(cartRepository, cartItemRepository)
 
 	cartHandler := handler.NewHandler(cartService, cartItemService)
 
