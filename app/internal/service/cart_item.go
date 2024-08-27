@@ -17,6 +17,10 @@ type CartItem struct {
 	cartItemRepository CartItemRepository
 }
 
+func NewCartItem(cartRepository CartRepository, cartItemRepository CartItemRepository) *CartItem {
+	return &CartItem{cartRepository: cartRepository, cartItemRepository: cartItemRepository}
+}
+
 func (c *CartItem) AddItemToCart(cartID, name string, quantity int) (models.CartItem, error) {
 	ok, err := c.cartRepository.CartIsAvailable(cartID)
 	if err != nil {
