@@ -13,6 +13,7 @@ type CartItemRepository interface {
 }
 
 type CartItem struct {
+	cartRepository     CartRepository
 	cartItemRepository CartItemRepository
 }
 
