@@ -23,7 +23,7 @@ type Cart struct {
 	DB *sqlx.DB
 }
 
-func (c *Cart) Init(db *sqlx.DB) *Cart {
+func InitCart(db *sqlx.DB) *Cart {
 	cart := &Cart{DB: db}
 
 	return cart
