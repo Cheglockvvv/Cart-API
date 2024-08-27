@@ -2,14 +2,15 @@ package service
 
 import (
 	"Cart-API/app/internal/models"
+	"context"
 	"fmt"
 )
 
 type CartItemRepository interface {
-	AddItemToCart(cartID, name string, quantity int) (string, error)
-	GetItemByID(id string) (models.CartItem, error)
-	RemoveItemFromCart(cartID, itemID string) error
-	ItemIsAvailable(id string) (bool, error)
+	AddItemToCart(context.Context, string, string, int) (string, error)
+	GetItemByID(context.Context, string) (models.CartItem, error)
+	RemoveItemFromCart(context.Context, string, string) error
+	ItemIsAvailable(context.Context, string) (bool, error)
 }
 
 type CartItem struct {
@@ -21,8 +22,8 @@ func NewCartItem(cartRepository CartRepository, cartItemRepository CartItemRepos
 	return &CartItem{cartRepository: cartRepository, cartItemRepository: cartItemRepository}
 }
 
-func (c *CartItem) AddItemToCart(cartID, name string, quantity int) (models.CartItem, error) {
-	ok, err := c.cartRepository.CartIsAvailable(cartID)
+func (c *CartItem) AddItemToCart(ctx context.Context, cartID, name string, quantity int) (models.CartItem, error) {
+	ok, err := c.cartRepository.CartIsAvailable(ctx, cartID)
 	if err != nil {
 		return models.CartItem{}, fmt.Errorf("c.cartRepository.CartIsAvailable: %w", err)
 	}
@@ -31,12 +32,12 @@ func (c *CartItem) AddItemToCart(cartID, name string, quantity int) (models.Cart
 		return models.CartItem{}, fmt.Errorf("cart is not available")
 	}
 
-	itemID, err := c.cartItemRepository.AddItemToCart(cartID, name, quantity)
+	itemID, err := c.cartItemRepository.AddItemToCart(ctx, cartID, name, quantity)
 	if err != nil {
 		return models.CartItem{}, fmt.Errorf("c.cartRepository.AddItemToCart: %w", err)
 	}
 
-	item, err := c.cartItemRepository.GetItemByID(itemID)
+	item, err := c.cartItemRepository.GetItemByID(ctx, itemID)
 	if err != nil {
 		return models.CartItem{}, fmt.Errorf("c.cartRepository.GetItemByID: %w", err)
 	}
@@ -44,8 +45,8 @@ func (c *CartItem) AddItemToCart(cartID, name string, quantity int) (models.Cart
 	return item, nil
 }
 
-func (c *CartItem) RemoveItemFromCart(cartID, itemID string) error {
-	ok, err := c.cartRepository.CartIsAvailable(cartID)
+func (c *CartItem) RemoveItemFromCart(ctx context.Context, cartID, itemID string) error {
+	ok, err := c.cartRepository.CartIsAvailable(ctx, cartID)
 	if err != nil {
 		return fmt.Errorf("c.cartRepository.CartIsAvailable: %w", err)
 	}
@@ -54,7 +55,7 @@ func (c *CartItem) RemoveItemFromCart(cartID, itemID string) error {
 		return fmt.Errorf("cart is not available")
 	}
 
-	ok, err = c.cartItemRepository.ItemIsAvailable(itemID)
+	ok, err = c.cartItemRepository.ItemIsAvailable(ctx, itemID)
 	if err != nil {
 		return fmt.Errorf("c.cartRepository.ItemIsAvailable: %w", err)
 	}
@@ -63,7 +64,7 @@ func (c *CartItem) RemoveItemFromCart(cartID, itemID string) error {
 		return fmt.Errorf("cart item is not available")
 	}
 
-	err = c.cartItemRepository.RemoveItemFromCart(cartID, itemID)
+	err = c.cartItemRepository.RemoveItemFromCart(ctx, cartID, itemID)
 	if err != nil {
 		return fmt.Errorf("c.cartRepository.RemoveItemFromCart: %w", err)
 	}
