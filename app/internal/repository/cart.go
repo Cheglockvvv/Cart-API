@@ -7,13 +7,6 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type cartItemEntity struct {
-	ID       string `db:"id"`
-	CartID   string `db:"cart_id"`
-	Product  string `db:"product"`
-	Quantity int    `db:"quantity"`
-}
-
 type cartEntity struct {
 	ID    string           `db:"id"`
 	Items []cartItemEntity `db:"items"`
