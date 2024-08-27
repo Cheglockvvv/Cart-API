@@ -92,3 +92,81 @@ func TestAddItemToCart(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveItemFromCart(t *testing.T) {
+	repoError := errors.New("some error")
+
+	tests := []struct {
+		name                string
+		mockCartIsAvailable bool
+		mockItemIsAvailable bool
+		mockCartID          string
+		mockItemID          string
+		mockError           error
+		expectedError       error
+	}{
+		{
+			name:                "Success Test",
+			mockCartIsAvailable: true,
+			mockItemIsAvailable: true,
+			mockCartID:          "1",
+			mockItemID:          "1",
+			mockError:           nil,
+			expectedError:       nil,
+		},
+		{
+			name:                "Failure: cart not found",
+			mockCartIsAvailable: false,
+			mockItemIsAvailable: false,
+			mockCartID:          "1",
+			mockItemID:          "15",
+			mockError:           nil,
+			expectedError:       errs.ErrCartNotFound,
+		},
+		{
+			name:                "Failure: item not found",
+			mockCartIsAvailable: true,
+			mockItemIsAvailable: false,
+			mockCartID:          "1",
+			mockItemID:          "15",
+			mockError:           nil,
+			expectedError:       errs.ErrItemNotFound,
+		},
+		{
+			name:                "Failure: repository error",
+			mockCartIsAvailable: false,
+			mockItemIsAvailable: false,
+			mockCartID:          "15",
+			mockItemID:          "15",
+			mockError:           repoError,
+			expectedError:       repoError,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+
+			mockCartRepo := mocks.NewMockCartRepository(ctrl)
+			mockCartRepo.EXPECT().CartIsAvailable(context.Background(),
+				test.mockCartID).Return(test.mockCartIsAvailable, test.mockError)
+
+			mockCartItemRepo := mocks.NewMockCartItemRepository(ctrl)
+			if test.mockCartIsAvailable {
+				mockCartItemRepo.EXPECT().ItemIsAvailable(context.Background(),
+					test.mockItemID).Return(test.mockItemIsAvailable, test.mockError)
+			}
+
+			if test.mockItemIsAvailable {
+				mockCartItemRepo.EXPECT().RemoveItemFromCart(context.Background(),
+					test.mockCartID, test.mockItemID).Return(test.mockError)
+			}
+
+			service := NewCartItem(mockCartRepo, mockCartItemRepo)
+			err := service.RemoveItemFromCart(context.Background(),
+				test.mockCartID, test.mockItemID)
+
+			assert.ErrorIs(t, err, test.expectedError)
+		})
+	}
+}
