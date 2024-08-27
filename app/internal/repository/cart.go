@@ -66,6 +66,7 @@ func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) 
 	}
 
 	cart := models.Cart{ID: cartEn.ID, Items: convertedItems}
+
 	return cart, nil
 }
 
