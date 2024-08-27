@@ -53,7 +53,7 @@ func (c *CartItem) RemoveItemFromCart(ctx context.Context, cartID, itemID string
 	}
 
 	if !ok {
-		return fmt.Errorf("cart is not available")
+		return errs.ErrCartNotFound
 	}
 
 	ok, err = c.cartItemRepository.ItemIsAvailable(ctx, itemID)
@@ -62,7 +62,7 @@ func (c *CartItem) RemoveItemFromCart(ctx context.Context, cartID, itemID string
 	}
 
 	if !ok {
-		return fmt.Errorf("cart item is not available")
+		return errs.ErrItemNotFound
 	}
 
 	err = c.cartItemRepository.RemoveItemFromCart(ctx, cartID, itemID)
