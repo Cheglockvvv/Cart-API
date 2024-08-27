@@ -10,6 +10,9 @@ import (
 type CartService interface {
 	CreateCart() (string, error)
 	GetCartByID(cartID string) (models.Cart, error)
+}
+
+type CartItemService interface {
 	AddItemToCart(cartID, name string, quantity int) (models.CartItem, error)
 	RemoveItemFromCart(cartID, itemID string) error
 }
