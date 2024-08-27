@@ -2,6 +2,7 @@ package repository
 
 import (
 	"Cart-API/app/internal/models"
+	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
 )
@@ -23,7 +24,7 @@ func InitCartItem(db *sqlx.DB) *CartItem {
 	return cartItem
 }
 
-func (c *CartItem) AddItemToCart(cartID, name string, quantity int) (string, error) {
+func (c *CartItem) AddItemToCart(ctx context.Context, cartID, name string, quantity int) (string, error) {
 
 	const query = `INSERT INTO cart_item (cart_id, product, quantity)
 								VALUES ($1, $2, $3)
@@ -41,7 +42,7 @@ func (c *CartItem) AddItemToCart(cartID, name string, quantity int) (string, err
 	return itemID, nil
 }
 
-func (c *CartItem) RemoveItemFromCart(cartID, itemID string) error {
+func (c *CartItem) RemoveItemFromCart(ctx context.Context, cartID, itemID string) error {
 	const query = `DELETE FROM cart_item WHERE cart_id = $1 AND id = $2`
 
 	_, err := c.DB.Exec(query, cartID, itemID)
@@ -52,7 +53,7 @@ func (c *CartItem) RemoveItemFromCart(cartID, itemID string) error {
 	return nil
 }
 
-func (c *CartItem) ItemIsAvailable(id string) (bool, error) {
+func (c *CartItem) ItemIsAvailable(ctx context.Context, id string) (bool, error) {
 	const checkItem = `SELECT id FROM cart_item WHERE id = $1`
 	result, err := c.DB.Exec(checkItem, id)
 	if err != nil {
@@ -70,7 +71,7 @@ func (c *CartItem) ItemIsAvailable(id string) (bool, error) {
 	return true, nil
 }
 
-func (c *CartItem) GetItemByID(id string) (models.CartItem, error) {
+func (c *CartItem) GetItemByID(ctx context.Context, id string) (models.CartItem, error) {
 	const query = `SELECT ci.id, ci.cart_id, ci.product, ci.quantity 
 								FROM cart_item ci 
 								WHERE ci.id = $1`
