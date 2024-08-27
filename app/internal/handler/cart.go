@@ -34,8 +34,8 @@ type cartEntity struct {
 	Items []cartItemEntity `json:"items"`
 }
 
-func NewHandler(cartService CartService) *Cart {
-	return &Cart{cartService: cartService}
+func NewHandler(cartService CartService, cartItemService CartItemService) *Cart {
+	return &Cart{cartService: cartService, cartItemService: cartItemService}
 }
 
 func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
