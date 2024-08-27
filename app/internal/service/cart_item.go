@@ -22,7 +22,7 @@ func NewCartItem(cartRepository CartRepository, cartItemRepository CartItemRepos
 	return &CartItem{cartRepository: cartRepository, cartItemRepository: cartItemRepository}
 }
 
-func (c *CartItem) AddItemToCart(ctx context.Context, cartID, name string, quantity int) (models.CartItem, error) {
+func (c *CartItem) AddItemToCart(ctx context.Context, cartID, product string, quantity int) (models.CartItem, error) {
 	ok, err := c.cartRepository.CartIsAvailable(ctx, cartID)
 	if err != nil {
 		return models.CartItem{}, fmt.Errorf("c.cartRepository.CartIsAvailable: %w", err)
@@ -32,7 +32,7 @@ func (c *CartItem) AddItemToCart(ctx context.Context, cartID, name string, quant
 		return models.CartItem{}, fmt.Errorf("cart is not available")
 	}
 
-	itemID, err := c.cartItemRepository.AddItemToCart(ctx, cartID, name, quantity)
+	itemID, err := c.cartItemRepository.AddItemToCart(ctx, cartID, product, quantity)
 	if err != nil {
 		return models.CartItem{}, fmt.Errorf("c.cartRepository.AddItemToCart: %w", err)
 	}
