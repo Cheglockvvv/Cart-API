@@ -156,14 +156,3 @@ func (c *Cart) GetItemByID(id string) (models.CartItem, error) {
 
 	return convertedItem, nil
 }
-
-func cartItemConvert(item cartItemEntity) models.CartItem {
-	modelItem := models.CartItem{
-		ID:       item.ID,
-		CartID:   item.CartID,
-		Product:  item.Product,
-		Quantity: item.Quantity,
-	}
-
-	return modelItem
-}
