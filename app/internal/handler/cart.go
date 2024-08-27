@@ -78,7 +78,7 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	item, err := c.cartService.AddItemToCart(cartID, parsedBody.Product, parsedBody.Quantity)
+	item, err := c.cartItemService.AddItemToCart(cartID, parsedBody.Product, parsedBody.Quantity)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
@@ -104,7 +104,7 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 	cartID := r.PathValue("cartID")
 	itemID := r.PathValue("itemID")
 
-	err := c.cartService.RemoveItemFromCart(cartID, itemID)
+	err := c.cartItemService.RemoveItemFromCart(cartID, itemID)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
