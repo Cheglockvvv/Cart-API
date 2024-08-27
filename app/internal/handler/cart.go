@@ -15,7 +15,8 @@ type CartService interface {
 }
 
 type Cart struct {
-	cartService CartService
+	cartService     CartService
+	cartItemService CartItemService
 }
 
 type cartItemEntity struct {
