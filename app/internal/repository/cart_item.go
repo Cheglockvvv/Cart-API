@@ -32,3 +32,14 @@ func (c *CartItem) AddItemToCart(cartID, name string, quantity int) (string, err
 
 	return itemID, nil
 }
+
+func (c *CartItem) RemoveItemFromCart(cartID, itemID string) error {
+	const query = `DELETE FROM cart_item WHERE cart_id = $1 AND id = $2`
+
+	_, err := c.DB.Exec(query, cartID, itemID)
+	if err != nil {
+		return fmt.Errorf("c.DB.Exec: %w", err)
+	}
+
+	return nil
+}
