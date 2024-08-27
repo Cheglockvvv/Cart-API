@@ -8,7 +8,6 @@ import (
 	"errors"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	_ "github.com/stretchr/testify/assert"
 	_ "github.com/stretchr/testify/mock"
 	"testing"
 )
