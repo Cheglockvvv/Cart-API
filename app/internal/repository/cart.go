@@ -23,14 +23,10 @@ type Cart struct {
 	DB *sqlx.DB
 }
 
-func (c *Cart) Init(connectionString string) error {
-	db, err := sqlx.Connect("pgx", connectionString)
-	if err != nil {
-		return fmt.Errorf("sqlx.Connect: %w", err)
-	}
+func (c *Cart) Init(db *sqlx.DB) *Cart {
+	cart := &Cart{DB: db}
 
-	c.DB = db
-	return nil
+	return cart
 }
 
 func (c *Cart) CreateCart() (string, error) {
