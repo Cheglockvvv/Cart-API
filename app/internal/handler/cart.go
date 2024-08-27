@@ -40,7 +40,9 @@ func NewHandler(cartService CartService, cartItemService CartItemService) *Cart 
 }
 
 func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
-	cartID, err := c.cartService.CreateCart()
+	ctx := r.Context()
+
+	cartID, err := c.cartService.CreateCart(ctx)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
@@ -56,6 +58,8 @@ func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	cartAdd := regexp.MustCompile(`^/cart/[0-9]+/items/*$`)
 	if !cartAdd.MatchString(r.URL.Path) {
 		http.Error(w, "", http.StatusBadRequest)
@@ -79,7 +83,7 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	item, err := c.cartItemService.AddItemToCart(cartID, parsedBody.Product, parsedBody.Quantity)
+	item, err := c.cartItemService.AddItemToCart(ctx, cartID, parsedBody.Product, parsedBody.Quantity)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
@@ -96,6 +100,8 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	cartRemove := regexp.MustCompile(`^/cart/[0-9]+/items/[0-9]+/*$`)
 	if !cartRemove.MatchString(r.URL.Path) {
 		http.Error(w, "", http.StatusBadRequest)
@@ -105,7 +111,7 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 	cartID := r.PathValue("cartID")
 	itemID := r.PathValue("itemID")
 
-	err := c.cartItemService.RemoveItemFromCart(cartID, itemID)
+	err := c.cartItemService.RemoveItemFromCart(ctx, cartID, itemID)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
@@ -120,6 +126,8 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
 	cartView := regexp.MustCompile(`^/cart/[0-9]+/*$`)
 	if !cartView.MatchString(r.URL.Path) {
 		http.Error(w, "", http.StatusBadRequest)
@@ -127,7 +135,7 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := r.PathValue("id")
-	cart, err := c.cartService.GetCartByID(id)
+	cart, err := c.cartService.GetCartByID(ctx, id)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
