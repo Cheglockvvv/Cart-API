@@ -16,7 +16,7 @@ type CartItem struct {
 	cartItemRepository CartItemRepository
 }
 
-func (c *Cart) AddItemToCart(cartID, name string, quantity int) (models.CartItem, error) {
+func (c *CartItem) AddItemToCart(cartID, name string, quantity int) (models.CartItem, error) {
 	ok, err := c.cartRepository.CartIsAvailable(cartID)
 	if err != nil {
 		return models.CartItem{}, fmt.Errorf("c.cartRepository.CartIsAvailable: %w", err)
@@ -39,7 +39,7 @@ func (c *Cart) AddItemToCart(cartID, name string, quantity int) (models.CartItem
 	return item, nil
 }
 
-func (c *Cart) RemoveItemFromCart(cartID, itemID string) error {
+func (c *CartItem) RemoveItemFromCart(cartID, itemID string) error {
 	ok, err := c.cartRepository.CartIsAvailable(cartID)
 	if err != nil {
 		return fmt.Errorf("c.cartRepository.CartIsAvailable: %w", err)

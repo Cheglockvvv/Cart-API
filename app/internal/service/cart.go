@@ -8,11 +8,7 @@ import (
 type CartRepository interface {
 	CreateCart() (string, error)
 	GetCartByID(id string) (models.Cart, error)
-	AddItemToCart(cartID, name string, quantity int) (string, error)
-	GetItemByID(id string) (models.CartItem, error)
-	RemoveItemFromCart(cartID, itemID string) error
 	CartIsAvailable(id string) (bool, error)
-	ItemIsAvailable(id string) (bool, error)
 }
 
 type Cart struct {
