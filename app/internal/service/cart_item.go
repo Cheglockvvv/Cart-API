@@ -1,6 +1,7 @@
 package service
 
 import (
+	"Cart-API/app/internal/errs"
 	"Cart-API/app/internal/models"
 	"context"
 	"fmt"
@@ -29,7 +30,7 @@ func (c *CartItem) AddItemToCart(ctx context.Context, cartID, product string, qu
 	}
 
 	if !ok {
-		return models.CartItem{}, fmt.Errorf("cart is not available")
+		return models.CartItem{}, errs.ErrCartNotFound
 	}
 
 	itemID, err := c.cartItemRepository.AddItemToCart(ctx, cartID, product, quantity)
