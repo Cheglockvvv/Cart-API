@@ -13,6 +13,7 @@ type CartItemRepository interface {
 }
 
 type CartItem struct {
+	cartItemRepository CartItemRepository
 }
 
 func (c *Cart) AddItemToCart(cartID, name string, quantity int) (models.CartItem, error) {
