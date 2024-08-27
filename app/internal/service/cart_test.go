@@ -1,10 +1,11 @@
 package service
 
 import (
-	"Cart-API/app/internal/errors"
+	"Cart-API/app/internal/errs"
 	"Cart-API/app/internal/models"
 	"Cart-API/app/internal/repository/mocks"
 	"context"
+	"errors"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	_ "github.com/stretchr/testify/assert"
@@ -13,6 +14,8 @@ import (
 )
 
 func TestCreateCart(t *testing.T) {
+	repoError := errors.New("some error")
+
 	tests := []struct {
 		name           string
 		mockCartID     string
@@ -27,24 +30,34 @@ func TestCreateCart(t *testing.T) {
 			expectedCartID: "1",
 			expectedError:  nil,
 		},
+		{
+			name:           "Failure: repository error",
+			mockCartID:     "",
+			mockError:      repoError,
+			expectedCartID: "",
+			expectedError:  repoError,
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			mockRepo := mocks.NewMockCartRepository(ctrl)
-			mockRepo.EXPECT().CreateCart(context.Background()).Return(test.mockCartID, test.mockError)
+			mockRepo.EXPECT().CreateCart(context.Background()).Return(test.mockCartID,
+				test.mockError)
 
 			service := NewCart(mockRepo)
 			cartID, err := service.CreateCart(context.Background())
 
 			assert.Equal(t, test.expectedCartID, cartID)
-			assert.Equal(t, test.expectedError, err)
+			assert.ErrorIs(t, err, test.expectedError)
 		})
 	}
 }
 
 func TestGetCartByID(t *testing.T) {
+	repoError := errors.New("some error")
+
 	tests := []struct {
 		name                string
 		inputCartID         string
@@ -85,7 +98,16 @@ func TestGetCartByID(t *testing.T) {
 			mockCart:            models.Cart{},
 			mockError:           nil,
 			expectedCart:        models.Cart{},
-			expectedError:       errors.ErrCartNotFound,
+			expectedError:       errs.ErrCartNotFound,
+		},
+		{
+			name:                "Failure: repository error",
+			inputCartID:         "1",
+			mockCartIsAvailable: false,
+			mockCart:            models.Cart{},
+			mockError:           repoError,
+			expectedCart:        models.Cart{},
+			expectedError:       repoError,
 		},
 	}
 
@@ -105,7 +127,7 @@ func TestGetCartByID(t *testing.T) {
 			cart, err := service.GetCartByID(context.Background(), test.inputCartID)
 
 			assert.Equal(t, test.expectedCart, cart)
-			assert.Equal(t, test.expectedError, err)
+			assert.ErrorIs(t, err, test.expectedError)
 		})
 	}
 }
