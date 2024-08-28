@@ -1,0 +1,144 @@
+basePath: /
+definitions:
+  handler.cartEntity:
+    properties:
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/handler.cartItemEntity'
+        type: array
+    type: object
+  handler.cartItemEntity:
+    properties:
+      cart_id:
+        type: string
+      id:
+        type: string
+      product:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  models.AddItemToCartRequest:
+    properties:
+      product:
+        type: string
+      quantity:
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a documentation to Cart-API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /cart:
+    post:
+      description: Creates a cart and returns it
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.cartEntity'
+        "500":
+          description: Internal Server Error
+      summary: Create a new cart
+      tags:
+      - Cart
+  /cart/{cart_id}/items/{item_id}:
+    delete:
+      description: removes a specified item from a specified cart
+      parameters:
+      - description: CartID
+        in: path
+        name: cart_id
+        required: true
+        type: string
+      - description: ItemID
+        in: path
+        name: item_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{}'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Remove item from cart
+      tags:
+      - CartItem
+  /cart/{id}:
+    get:
+      description: With specified CartID returns a cart
+      parameters:
+      - description: CartID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.cartEntity'
+        "400":
+          description: Bad Request
+        "422":
+          description: Unprocessable Entity
+        "500":
+          description: Internal Server Error
+      summary: Get a cart by ID
+      tags:
+      - Cart
+  /cart/{id}/items:
+    post:
+      consumes:
+      - application/json
+      description: adds an item to a specified cart with provided details and returns
+        it
+      parameters:
+      - description: cart id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Item to add to cart
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddItemToCartRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.cartItemEntity'
+        "400":
+          description: Bad Request
+        "422":
+          description: Unprocessable Entity
+        "500":
+          description: Internal Server Error
+      summary: Add item to cart
+      tags:
+      - CartItem
+swagger: "2.0"
