@@ -1,9 +1,9 @@
 package handler
 
 import (
-	models "Cart-API/app/internal/models"
 	"context"
 	"encoding/json"
+	models "github.com/Cheglockvvv/Cart-API/app/internal/models"
 	"net/http"
 	"regexp"
 )

@@ -1,9 +1,9 @@
 package repository
 
 import (
-	models "Cart-API/app/internal/models"
 	"context"
 	"fmt"
+	models "github.com/Cheglockvvv/Cart-API/app/internal/models"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 )

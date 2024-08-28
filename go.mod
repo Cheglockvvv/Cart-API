@@ -1,4 +1,4 @@
-module Cart-API
+module github.com/Cheglockvvv/Cart-API
 
 go 1.22.5
 
@@ -7,7 +7,6 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/http-swagger v1.3.4

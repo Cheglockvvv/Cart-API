@@ -1,10 +1,10 @@
 package service
 
 import (
-	"Cart-API/app/internal/errs"
-	"Cart-API/app/internal/models"
 	"context"
 	"fmt"
+	"github.com/Cheglockvvv/Cart-API/app/internal/errs"
+	"github.com/Cheglockvvv/Cart-API/app/internal/models"
 )
 
 type CartRepository interface {
