@@ -7,11 +7,27 @@ import (
 	"Cart-API/app/internal/handler"
 	"Cart-API/app/internal/repository"
 	"Cart-API/app/internal/service"
+	_ "Cart-API/docs"
 	"fmt"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"log"
 	"net/http"
 )
 
+// @title Swagger Example API
+// @version 1.0
+// @description This is a documentation to Cart-API
+// @termsOfService http://swagger.io/terms/
+
+// @Contact.name API Support
+// @Contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /
 func main() {
 	cfg, err := config.LoadEnv()
 	if err != nil {
@@ -46,6 +62,9 @@ func main() {
 	mux.HandleFunc("POST /cart/{id}/items", cartHandler.AddItemToCart)
 	mux.HandleFunc("DELETE /cart/{cartID}/items/{itemID}", cartHandler.RemoveItemFromCart)
 	mux.HandleFunc("GET /cart/{id}", cartHandler.GetCartByID)
+
+	mux.Handle("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8080/swagger/doc.json")))
 
 	err = http.ListenAndServe(fmt.Sprintf(":%s", cfg.API.Port), mux)
 	if err != nil {
