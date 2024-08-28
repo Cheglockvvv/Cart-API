@@ -39,6 +39,14 @@ func NewHandler(cartService CartService, cartItemService CartItemService) *Cart 
 	return &Cart{cartService: cartService, cartItemService: cartItemService}
 }
 
+// CreateCart godoc
+// @Summary Create a new cart
+// @Description Creates a cart and returns it
+// @Tags Cart
+// @Produce json
+// @Success 200 {object} cartEntity
+// @Failure 500 "Internal Server Error"
+// @Router /cart [post]
 func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -57,6 +65,19 @@ func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// AddItemToCart godoc
+// @Summary Add item to cart
+// @Description adds an item to a specified cart with provided details and returns it
+// @Tags CartItem
+// @Accept json
+// @Produce json
+// @Param id path string true "cart id"
+// @Param item body models.AddItemToCartRequest true "Item to add to cart"
+// @Success 200 {object} cartItemEntity
+// @Failure 400 "Bad Request"
+// @Failure 422 "Unprocessable Entity"
+// @Failure 500 "Internal Server Error"
+// @Router /cart/{id}/items [post]
 func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -99,6 +120,17 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// RemoveItemFromCart godoc
+// @Summary Remove item from cart
+// @Description removes a specified item from a specified cart
+// @Tags CartItem
+// @Produce json
+// @Param cart_id path string true "CartID"
+// @Param item_id path string true "ItemID"
+// @Success 200 "{}"
+// @Failure 400 "Bad Request"
+// @Failure 500 "Internal Server Error"
+// @Router /cart/{cart_id}/items/{item_id} [delete]
 func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -125,6 +157,17 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetCartByID godoc
+// @Summary Get a cart by ID
+// @Description With specified CartID returns a cart
+// @Tags Cart
+// @Produce json
+// @Param id path string true "CartID"
+// @Success 200 {object} cartEntity
+// @Failure 400 "Bad Request"
+// @Failure 422 "Unprocessable Entity"
+// @Failure 500 "Internal Server Error"
+// @Router /cart/{id} [get]
 func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
@@ -138,7 +181,7 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	cart, err := c.cartService.GetCartByID(ctx, id)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 
@@ -153,7 +196,7 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	err = json.NewEncoder(w).Encode(convertedCart)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 }
