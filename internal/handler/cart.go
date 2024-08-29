@@ -221,9 +221,9 @@ func cartItemConvert(modelItem models.CartItem) cartItemDTO {
 }
 
 func cartConvert(modelCart models.Cart) cartEntityDTO {
-	cartItems := make([]cartItemDTO, len(modelCart.Items)) // TODO: to make with 0 and cap=len()
-	for i, item := range modelCart.Items {
-		cartItems[i] = cartItemConvert(item)
+	cartItems := make([]cartItemDTO, 0, len(modelCart.Items))
+	for _, item := range modelCart.Items {
+		cartItems = append(cartItems, cartItemConvert(item))
 	}
 
 	cart := cartEntityDTO{
