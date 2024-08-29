@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/Cheglockvvv/Cart-API/app/internal/errs"
-	"github.com/Cheglockvvv/Cart-API/app/internal/models"
+	"github.com/Cheglockvvv/Cart-API/internal/errs"
+	"github.com/Cheglockvvv/Cart-API/internal/models"
 )
 
 type CartRepository interface {
@@ -36,7 +36,7 @@ func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) 
 	}
 
 	if !ok {
-		return models.Cart{}, errs.ErrCartNotFound
+		return models.Cart{}, errs.ErrCartNotFound // TODO: cart is available return this error
 	}
 
 	cart, err := c.cartRepository.GetCartByID(ctx, id)

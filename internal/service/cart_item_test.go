@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 	"errors"
-	"github.com/Cheglockvvv/Cart-API/app/internal/errs"
-	"github.com/Cheglockvvv/Cart-API/app/internal/models"
-	"github.com/Cheglockvvv/Cart-API/app/internal/repository/mocks"
+	"github.com/Cheglockvvv/Cart-API/internal/errs"
+	"github.com/Cheglockvvv/Cart-API/internal/models"
+	"github.com/Cheglockvvv/Cart-API/internal/repository/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -26,7 +26,7 @@ func TestAddItemToCart(t *testing.T) {
 		expectedError       error
 	}{
 		{
-			name:                "Success Test",
+			name:                "Success Test", // TODO: remove test
 			mockCartIsAvailable: true,
 			mockItemID:          "1",
 			mockCartID:          "1",

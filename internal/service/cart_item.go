@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/Cheglockvvv/Cart-API/app/internal/errs"
-	"github.com/Cheglockvvv/Cart-API/app/internal/models"
+	"github.com/Cheglockvvv/Cart-API/internal/errs"
+	"github.com/Cheglockvvv/Cart-API/internal/models"
 )
 
 type CartItemRepository interface {
@@ -30,9 +30,10 @@ func (c *CartItem) AddItemToCart(ctx context.Context, cartID, product string, qu
 	}
 
 	if !ok {
-		return models.CartItem{}, errs.ErrCartNotFound
+		return models.CartItem{}, errs.ErrCartNotFound // TODO: same
 	}
 
+	// TODO: add transaction blyaaat jackpot
 	itemID, err := c.cartItemRepository.AddItemToCart(ctx, cartID, product, quantity)
 	if err != nil {
 		return models.CartItem{}, fmt.Errorf("c.cartRepository.AddItemToCart: %w", err)
@@ -53,7 +54,7 @@ func (c *CartItem) RemoveItemFromCart(ctx context.Context, cartID, itemID string
 	}
 
 	if !ok {
-		return errs.ErrCartNotFound
+		return errs.ErrCartNotFound // TODO: same
 	}
 
 	ok, err = c.cartItemRepository.ItemIsAvailable(ctx, itemID)
