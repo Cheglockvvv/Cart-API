@@ -54,21 +54,14 @@ func (c *CartItem) Delete(ctx context.Context, cartID, itemID string) error {
 }
 
 func (c *CartItem) ItemExists(ctx context.Context, id string) (bool, error) {
-	const checkItem = `SELECT id FROM cart_item WHERE id = $1`
-	result, err := c.DB.ExecContext(ctx, checkItem, id)
+	const checkItem = `SELECT EXISTS(SELECT 1 FROM cart_item WHERE id = $1)`
+	var exists bool
+	err := c.DB.QueryRowxContext(ctx, checkItem, id).Scan(&exists)
 	if err != nil {
-		return false, fmt.Errorf("c.DB.Exec: %w", err)
-	}
-	count, err := result.RowsAffected()
-	if err != nil {
-		return false, fmt.Errorf("result.RowsAffected: %w", err)
+		return false, fmt.Errorf("c.DB.QueryRowxContext.Scan: %w", err)
 	}
 
-	if count != 1 {
-		return false, nil
-	}
-
-	return true, nil
+	return exists, nil
 }
 
 func (c *CartItem) Read(ctx context.Context, id string) (models.CartItem, error) {
