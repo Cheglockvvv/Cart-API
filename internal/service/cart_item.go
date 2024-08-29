@@ -8,10 +8,10 @@ import (
 )
 
 type CartItemRepository interface {
-	AddItemToCart(context.Context, string, string, int) (string, error)
-	GetItemByID(context.Context, string) (models.CartItem, error)
-	RemoveItemFromCart(context.Context, string, string) error
-	ItemIsAvailable(context.Context, string) (bool, error)
+	Create(context.Context, string, string, int) (string, error)
+	Read(context.Context, string) (models.CartItem, error)
+	Delete(context.Context, string, string) error
+	ItemExists(context.Context, string) (bool, error)
 }
 
 type CartItem struct {
@@ -34,14 +34,14 @@ func (c *CartItem) AddItemToCart(ctx context.Context, cartID, product string, qu
 	}
 
 	// TODO: add transaction blyaaat jackpot
-	itemID, err := c.cartItemRepository.AddItemToCart(ctx, cartID, product, quantity)
+	itemID, err := c.cartItemRepository.Create(ctx, cartID, product, quantity)
 	if err != nil {
-		return models.CartItem{}, fmt.Errorf("c.cartRepository.AddItemToCart: %w", err)
+		return models.CartItem{}, fmt.Errorf("c.cartRepository.Create: %w", err)
 	}
 
-	item, err := c.cartItemRepository.GetItemByID(ctx, itemID)
+	item, err := c.cartItemRepository.Read(ctx, itemID)
 	if err != nil {
-		return models.CartItem{}, fmt.Errorf("c.cartRepository.GetItemByID: %w", err)
+		return models.CartItem{}, fmt.Errorf("c.cartRepository.Read: %w", err)
 	}
 
 	return item, nil
@@ -57,18 +57,18 @@ func (c *CartItem) RemoveItemFromCart(ctx context.Context, cartID, itemID string
 		return errs.ErrCartNotFound // TODO: same
 	}
 
-	ok, err = c.cartItemRepository.ItemIsAvailable(ctx, itemID)
+	ok, err = c.cartItemRepository.ItemExists(ctx, itemID)
 	if err != nil {
-		return fmt.Errorf("c.cartRepository.ItemIsAvailable: %w", err)
+		return fmt.Errorf("c.cartRepository.ItemExists: %w", err)
 	}
 
 	if !ok {
 		return errs.ErrItemNotFound
 	}
 
-	err = c.cartItemRepository.RemoveItemFromCart(ctx, cartID, itemID)
+	err = c.cartItemRepository.Delete(ctx, cartID, itemID)
 	if err != nil {
-		return fmt.Errorf("c.cartRepository.RemoveItemFromCart: %w", err)
+		return fmt.Errorf("c.cartRepository.Delete: %w", err)
 	}
 
 	return nil
