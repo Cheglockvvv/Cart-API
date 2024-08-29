@@ -3,11 +3,12 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	models "github.com/Cheglockvvv/Cart-API/app/internal/models"
+	"github.com/Cheglockvvv/Cart-API/internal/models"
 	"net/http"
 	"regexp"
 )
 
+// TODO: make tests че за хуйня
 type CartService interface {
 	CreateCart(context.Context) (string, error)
 	GetCartByID(context.Context, string) (models.Cart, error)
@@ -23,23 +24,23 @@ type Cart struct {
 	cartItemService CartItemService
 }
 
-type cartItemEntity struct {
+type cartItemEntity struct { //TODO: dto switch
 	ID       string `json:"id"`
 	CartID   string `json:"cart_id"`
 	Product  string `json:"product"`
 	Quantity int    `json:"quantity"`
 }
 
-type cartEntity struct {
+type cartEntity struct { //TODO: dto switch
 	ID    string           `json:"id"`
 	Items []cartItemEntity `json:"items"`
 }
 
-func NewHandler(cartService CartService, cartItemService CartItemService) *Cart {
+func NewCart(cartService CartService, cartItemService CartItemService) *Cart { // TODO: NewCart
 	return &Cart{cartService: cartService, cartItemService: cartItemService}
 }
 
-// CreateCart godoc
+// TODO: remove or not
 // @Summary Create a new cart
 // @Description Creates a cart and returns it
 // @Tags Cart
@@ -58,30 +59,33 @@ func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
 
 	cart := cartEntity{ID: cartID, Items: []cartItemEntity{}}
 	err = json.NewEncoder(w).Encode(cart)
-
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 }
 
-// AddItemToCart godoc
 // @Summary Add item to cart
 // @Description adds an item to a specified cart with provided details and returns it
 // @Tags CartItem
 // @Accept json
 // @Produce json
 // @Param id path string true "cart id"
-// @Param item body models.AddItemToCartRequest true "Item to add to cart"
+// @Param item body handler.AddItemToCart.request true "Item to add to cart"
 // @Success 200 {object} cartItemEntity
 // @Failure 400 "Bad Request"
 // @Failure 422 "Unprocessable Entity"
 // @Failure 500 "Internal Server Error"
 // @Router /cart/{id}/items [post]
 func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
+	type request struct { // TODO: Олег сказал, что самый пиздатый способ.!!!
+		Product  string `json:"product"`
+		Quantity int    `json:"quantity"`
+	}
+
 	ctx := r.Context()
 
-	cartAdd := regexp.MustCompile(`^/cart/[0-9]+/items/*$`)
+	cartAdd := regexp.MustCompile(`^/cart/[0-9]+/items/*$`) // TODO: move to global variable
 	if !cartAdd.MatchString(r.URL.Path) {
 		http.Error(w, "", http.StatusBadRequest)
 		return
@@ -104,14 +108,15 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	item, err := c.cartItemService.AddItemToCart(ctx, cartID, parsedBody.Product, parsedBody.Quantity)
+	item, err := c.cartItemService.AddItemToCart(ctx, cartID, parsedBody.Product,
+		parsedBody.Quantity)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 
 	convertedItem := cartItemConvert(item)
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json") // TODO: move to middleware
 	err = json.NewEncoder(w).Encode(convertedItem)
 
 	if err != nil {
@@ -120,7 +125,6 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// RemoveItemFromCart godoc
 // @Summary Remove item from cart
 // @Description removes a specified item from a specified cart
 // @Tags CartItem
@@ -134,7 +138,7 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	cartRemove := regexp.MustCompile(`^/cart/[0-9]+/items/[0-9]+/*$`)
+	cartRemove := regexp.MustCompile(`^/cart/[0-9]+/items/[0-9]+/*$`) // TODO: same
 	if !cartRemove.MatchString(r.URL.Path) {
 		http.Error(w, "", http.StatusBadRequest)
 		return
@@ -149,7 +153,7 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json") // TODO: same
 	_, err = w.Write([]byte("{}"))
 
 	if err != nil {
@@ -157,7 +161,6 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// GetCartByID godoc
 // @Summary Get a cart by ID
 // @Description With specified CartID returns a cart
 // @Tags Cart
@@ -171,7 +174,7 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	cartView := regexp.MustCompile(`^/cart/[0-9]+/*$`)
+	cartView := regexp.MustCompile(`^/cart/[0-9]+/*$`) // TODO: same
 	if !cartView.MatchString(r.URL.Path) {
 		http.Error(w, "", http.StatusBadRequest)
 		return
@@ -192,7 +195,7 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 
 	convertedCart := cartConvert(cart)
 
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/json") // TODO: same
 	err = json.NewEncoder(w).Encode(convertedCart)
 
 	if err != nil {
@@ -213,7 +216,7 @@ func cartItemConvert(modelItem models.CartItem) cartItemEntity {
 }
 
 func cartConvert(modelCart models.Cart) cartEntity {
-	cartItems := make([]cartItemEntity, len(modelCart.Items))
+	cartItems := make([]cartItemEntity, len(modelCart.Items)) // TODO: to make with 0 and cap=len()
 	for i, item := range modelCart.Items {
 		cartItems[i] = cartItemConvert(item)
 	}

@@ -40,7 +40,7 @@ func main() {
 	}
 
 	cartRepository := repository.NewCart(db)
-	cartItemRepository := repository.NewCartItem(db) // TODO: same
+	cartItemRepository := repository.NewCartItem(db)
 
 	//err = migrations.Down(cartRepository.db)
 	err = migrations.Up(cartRepository.DB)
@@ -48,10 +48,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cartService := service.NewCart(cartRepository) // TODO: why not init. <3
+	cartService := service.NewCart(cartRepository)
 	cartItemService := service.NewCartItem(cartRepository, cartItemRepository)
 
-	cartHandler := handler.NewHandler(cartService, cartItemService) // TODO: NewCart
+	cartHandler := handler.NewCart(cartService, cartItemService)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /cart", cartHandler.CreateCart)
