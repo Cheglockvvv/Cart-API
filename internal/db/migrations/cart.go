@@ -9,8 +9,8 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func Up(db *sqlx.DB) error {
-	m, err := initMigrator(db)
+func Up(db *sqlx.DB, migrationsLocation string) error {
+	m, err := initMigrator(db, migrationsLocation)
 	if err != nil {
 		return fmt.Errorf("initMigrator: %w", err)
 	}
@@ -23,8 +23,8 @@ func Up(db *sqlx.DB) error {
 	return nil
 }
 
-func Down(db *sqlx.DB) error {
-	m, err := initMigrator(db)
+func Down(db *sqlx.DB, migrationsLocation string) error {
+	m, err := initMigrator(db, migrationsLocation)
 	if err != nil {
 		return fmt.Errorf("initMigrator: %w", err)
 	}
@@ -37,14 +37,14 @@ func Down(db *sqlx.DB) error {
 	return nil
 }
 
-func initMigrator(db *sqlx.DB) (*migrate.Migrate, error) {
+func initMigrator(db *sqlx.DB, migrationsLocation string) (*migrate.Migrate, error) {
 	driver, err := postgres.WithInstance(db.DB, &postgres.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("postgres.WithInstance: %w", err)
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		"file:///cartApi/migrations", // TODO: via config
+		fmt.Sprintf("file://%s", migrationsLocation),
 		"postgres", driver)
 
 	if err != nil {

@@ -43,7 +43,7 @@ func main() {
 	cartRepository := repository.NewCart(db)
 	cartItemRepository := repository.NewCartItem(db)
 
-	err = migrations.Up(cartRepository.DB)
+	err = migrations.Up(cartRepository.DB, cfg.API.Migrations)
 	if err != nil {
 		log.Println(err)
 	}

@@ -6,7 +6,8 @@ import (
 )
 
 type APIConfig struct {
-	Port string `env:"API_PORT"`
+	Port       string `env:"API_PORT"`
+	Migrations string `env:"API_MIGRATIONS_LOCATION"`
 }
 
 type DBConfig struct {
