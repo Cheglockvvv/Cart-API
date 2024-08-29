@@ -9,6 +9,7 @@ import (
 	"github.com/Cheglockvvv/Cart-API/internal/handler"
 	"github.com/Cheglockvvv/Cart-API/internal/repository"
 	"github.com/Cheglockvvv/Cart-API/internal/service"
+	"github.com/go-chi/chi"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"log"
 	"net/http"
@@ -42,7 +43,6 @@ func main() {
 	cartRepository := repository.NewCart(db)
 	cartItemRepository := repository.NewCartItem(db)
 
-	//err = migrations.Down(cartRepository.db)
 	err = migrations.Up(cartRepository.DB)
 	if err != nil {
 		log.Fatal(err)
@@ -53,26 +53,16 @@ func main() {
 
 	cartHandler := handler.NewCart(cartService, cartItemService)
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("POST /cart", cartHandler.CreateCart)
-	mux.HandleFunc("POST /cart/{id}/items", cartHandler.AddItemToCart)
-	mux.HandleFunc("DELETE /cart/{cartID}/items/{itemID}", cartHandler.RemoveItemFromCart)
-	mux.HandleFunc("GET /cart/{id}", cartHandler.GetCartByID)
+	router := chi.NewRouter()
+	router.Post("/cart", cartHandler.CreateCart)
+	router.Get("/cart/{id}", cartHandler.GetCartByID)
+	router.Post("/cart/{id}/items", cartHandler.AddItemToCart)
+	router.Delete("/cart/{cart_id}/items/{item_id}", cartHandler.RemoveItemFromCart)
 
-	//mux.Handle("/swagger/*", http.StripPrefix("/swagger/*",
-	//	http.FileServer(http.Dir("./docs.json")))) // TODO: remove comments
+	router.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL(fmt.Sprintf("http://localhost:%s/swagger/doc.json", cfg.API.Port))))
 
-	mux.Handle("GET /swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:8080/swagger/doc.json"), //TODO: chi, port
-	))
-
-	//r := chi.NewRouter() TODO: remove comments
-	//
-	//r.Get("/swagger/*", httpSwagger.Handler(
-	//	httpSwagger.URL("http://localhost:8080/swagger/doc.json")))
-
-	err = http.ListenAndServe(fmt.Sprintf(":%s", cfg.API.Port), mux)
-
+	err = http.ListenAndServe(fmt.Sprintf(":%s", cfg.API.Port), router)
 	if err != nil {
 		log.Fatal(err)
 	}
