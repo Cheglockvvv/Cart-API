@@ -55,13 +55,13 @@ func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) 
 
 		if err != nil {
 			return models.Cart{}, fmt.Errorf("rows.StructScan: %w", err)
-		} // TODO:
+		}
 		items = append(items, row)
 	}
 
-	convertedItems := make([]models.CartItem, len(items)) // TODO: unnecessary allocations
+	convertedItems := make([]models.CartItem, 0, len(items))
 	for i := range items {
-		convertedItems[i] = cartItemConvert(items[i])
+		convertedItems = append(convertedItems, cartItemConvert(items[i]))
 	}
 
 	cart := models.Cart{ID: cartEn.id, Items: convertedItems}
@@ -69,13 +69,13 @@ func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) 
 	return cart, nil
 }
 
-func (c *Cart) CartIsAvailable(ctx context.Context, id string) (bool, error) { // TODO: rename to exists returns error
+func (c *Cart) CartExists(ctx context.Context, id string) (bool, error) { // TODO: rename to exists returns error
 
-	const query = `SELECT EXISTS(SELECT 1 FROM cart_item WHERE cart_id = $1)` // TODO: eбаааать
+	const query = `SELECT EXISTS(SELECT 1 FROM cart_item WHERE cart_id = $1)`
 	result, err := c.DB.ExecContext(ctx, query, id)
 	if err != nil {
-		return false, fmt.Errorf("c.DB.Exec: %w", err)
-	} // TODO:
+		return false, fmt.Errorf("c.DB.ExecContext: %w", err)
+	}
 	count, err := result.RowsAffected() //TODO: remove
 	if err != nil {
 		return false, fmt.Errorf("result.RowsAffected: %w", err)

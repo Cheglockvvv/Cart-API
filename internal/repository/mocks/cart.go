@@ -36,9 +36,9 @@ func (m *MockCartRepository) EXPECT() *MockCartRepositoryMockRecorder {
 }
 
 // CartIsAvailable mocks base method.
-func (m *MockCartRepository) CartIsAvailable(arg0 context.Context, arg1 string) (bool, error) {
+func (m *MockCartRepository) CartExists(arg0 context.Context, arg1 string) (bool, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CartIsAvailable", arg0, arg1)
+	ret := m.ctrl.Call(m, "CartExists", arg0, arg1)
 	ret0, _ := ret[0].(bool)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -47,7 +47,7 @@ func (m *MockCartRepository) CartIsAvailable(arg0 context.Context, arg1 string) 
 // CartIsAvailable indicates an expected call of CartIsAvailable.
 func (mr *MockCartRepositoryMockRecorder) CartIsAvailable(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CartIsAvailable", reflect.TypeOf((*MockCartRepository)(nil).CartIsAvailable), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CartExists", reflect.TypeOf((*MockCartRepository)(nil).CartExists), arg0, arg1)
 }
 
 // CreateCart mocks base method.
