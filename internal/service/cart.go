@@ -10,7 +10,7 @@ import (
 type CartRepository interface {
 	CreateCart(context.Context) (string, error)
 	GetCartByID(context.Context, string) (models.Cart, error)
-	CartIsAvailable(context.Context, string) (bool, error)
+	CartExists(context.Context, string) (bool, error)
 }
 
 type Cart struct {
@@ -30,9 +30,9 @@ func (c *Cart) CreateCart(ctx context.Context) (string, error) {
 }
 
 func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) {
-	ok, err := c.cartRepository.CartIsAvailable(ctx, id)
+	ok, err := c.cartRepository.CartExists(ctx, id)
 	if err != nil {
-		return models.Cart{}, fmt.Errorf("c.cartRepository.CartIsAvailable: %w", err)
+		return models.Cart{}, fmt.Errorf("c.cartRepository.CartExists: %w", err)
 	}
 
 	if !ok {

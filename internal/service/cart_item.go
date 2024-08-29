@@ -24,9 +24,9 @@ func NewCartItem(cartRepository CartRepository, cartItemRepository CartItemRepos
 }
 
 func (c *CartItem) AddItemToCart(ctx context.Context, cartID, product string, quantity int) (models.CartItem, error) {
-	ok, err := c.cartRepository.CartIsAvailable(ctx, cartID)
+	ok, err := c.cartRepository.CartExists(ctx, cartID)
 	if err != nil {
-		return models.CartItem{}, fmt.Errorf("c.cartRepository.CartIsAvailable: %w", err)
+		return models.CartItem{}, fmt.Errorf("c.cartRepository.CartExists: %w", err)
 	}
 
 	if !ok {
@@ -48,9 +48,9 @@ func (c *CartItem) AddItemToCart(ctx context.Context, cartID, product string, qu
 }
 
 func (c *CartItem) RemoveItemFromCart(ctx context.Context, cartID, itemID string) error {
-	ok, err := c.cartRepository.CartIsAvailable(ctx, cartID)
+	ok, err := c.cartRepository.CartExists(ctx, cartID)
 	if err != nil {
-		return fmt.Errorf("c.cartRepository.CartIsAvailable: %w", err)
+		return fmt.Errorf("c.cartRepository.CartExists: %w", err)
 	}
 
 	if !ok {
