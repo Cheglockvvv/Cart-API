@@ -38,7 +38,7 @@ func (m *MockCartItemRepository) EXPECT() *MockCartItemRepositoryMockRecorder {
 // AddItemToCart mocks base method.
 func (m *MockCartItemRepository) Create(arg0 context.Context, arg1, arg2 string, arg3 int) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", arg0, arg1, arg2, arg3)
+	ret := m.ctrl.Call(m, "CreateCart", arg0, arg1, arg2, arg3)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -47,13 +47,13 @@ func (m *MockCartItemRepository) Create(arg0 context.Context, arg1, arg2 string,
 // AddItemToCart indicates an expected call of AddItemToCart.
 func (mr *MockCartItemRepositoryMockRecorder) AddItemToCart(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockCartItemRepository)(nil).Create), arg0, arg1, arg2, arg3)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCart", reflect.TypeOf((*MockCartItemRepository)(nil).Create), arg0, arg1, arg2, arg3)
 }
 
 // GetItemByID mocks base method.
 func (m *MockCartItemRepository) Read(arg0 context.Context, arg1 string) (models.CartItem, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Read", arg0, arg1)
+	ret := m.ctrl.Call(m, "GetCartByID", arg0, arg1)
 	ret0, _ := ret[0].(models.CartItem)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -62,7 +62,7 @@ func (m *MockCartItemRepository) Read(arg0 context.Context, arg1 string) (models
 // GetItemByID indicates an expected call of GetItemByID.
 func (mr *MockCartItemRepositoryMockRecorder) GetItemByID(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*MockCartItemRepository)(nil).Read), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCartByID", reflect.TypeOf((*MockCartItemRepository)(nil).Read), arg0, arg1)
 }
 
 // ItemIsAvailable mocks base method.

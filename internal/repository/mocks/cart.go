@@ -51,31 +51,31 @@ func (mr *MockCartRepositoryMockRecorder) CartIsAvailable(arg0, arg1 interface{}
 }
 
 // CreateCart mocks base method.
-func (m *MockCartRepository) CreateCart(arg0 context.Context) (string, error) {
+func (m *MockCartRepository) Create(arg0 context.Context) (string, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateCart", arg0)
+	ret := m.ctrl.Call(m, "Create", arg0)
 	ret0, _ := ret[0].(string)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateCart indicates an expected call of CreateCart.
-func (mr *MockCartRepositoryMockRecorder) CreateCart(arg0 interface{}) *gomock.Call {
+func (mr *MockCartRepositoryMockRecorder) Create(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCart", reflect.TypeOf((*MockCartRepository)(nil).CreateCart), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockCartRepository)(nil).Create), arg0)
 }
 
 // GetCartByID mocks base method.
-func (m *MockCartRepository) GetCartByID(arg0 context.Context, arg1 string) (models.Cart, error) {
+func (m *MockCartRepository) Read(arg0 context.Context, arg1 string) (models.Cart, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCartByID", arg0, arg1)
+	ret := m.ctrl.Call(m, "Read", arg0, arg1)
 	ret0, _ := ret[0].(models.Cart)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetCartByID indicates an expected call of GetCartByID.
-func (mr *MockCartRepositoryMockRecorder) GetCartByID(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockCartRepositoryMockRecorder) Read(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCartByID", reflect.TypeOf((*MockCartRepository)(nil).GetCartByID), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Read", reflect.TypeOf((*MockCartRepository)(nil).Read), arg0, arg1)
 }
