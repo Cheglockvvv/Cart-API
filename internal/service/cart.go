@@ -8,8 +8,8 @@ import (
 )
 
 type CartRepository interface {
-	CreateCart(context.Context) (string, error)
-	GetCartByID(context.Context, string) (models.Cart, error)
+	Create(context.Context) (string, error)
+	Read(context.Context, string) (models.Cart, error)
 	CartExists(context.Context, string) (bool, error)
 }
 
@@ -22,7 +22,7 @@ func NewCart(repository CartRepository) *Cart {
 }
 
 func (c *Cart) CreateCart(ctx context.Context) (string, error) {
-	id, err := c.cartRepository.CreateCart(ctx)
+	id, err := c.cartRepository.Create(ctx)
 	if err != nil {
 		return "", fmt.Errorf("c.cartRepository.CreateCart: %w", err)
 	}
@@ -39,7 +39,7 @@ func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) 
 		return models.Cart{}, errs.ErrCartNotFound // TODO: cart is available return this error
 	}
 
-	cart, err := c.cartRepository.GetCartByID(ctx, id)
+	cart, err := c.cartRepository.Read(ctx, id)
 	if err != nil {
 		return models.Cart{}, fmt.Errorf("c.cartRepository.GetCartByID: %w", err)
 	}
