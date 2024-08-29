@@ -40,7 +40,7 @@ func main() {
 	}
 
 	cartRepository := repository.NewCart(db)
-	cartItemRepository := repository.InitCartItem(db) // TODO: same
+	cartItemRepository := repository.NewCartItem(db) // TODO: same
 
 	//err = migrations.Down(cartRepository.db)
 	err = migrations.Up(cartRepository.DB)

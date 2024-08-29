@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
-	"github.com/Cheglockvvv/Cart-API/app/internal/models"
+	"github.com/Cheglockvvv/Cart-API/internal/models"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -18,12 +18,13 @@ type CartItem struct {
 	DB *sqlx.DB
 }
 
-func InitCartItem(db *sqlx.DB) *CartItem {
+func NewCartItem(db *sqlx.DB) *CartItem {
 	cartItem := &CartItem{DB: db}
 
 	return cartItem
 }
 
+// TODO: create
 func (c *CartItem) AddItemToCart(ctx context.Context, cartID, name string, quantity int) (string, error) {
 
 	const query = `INSERT INTO cart_item (cart_id, product, quantity)
@@ -42,6 +43,7 @@ func (c *CartItem) AddItemToCart(ctx context.Context, cartID, name string, quant
 	return itemID, nil
 }
 
+// TODO:fasdgasg
 func (c *CartItem) RemoveItemFromCart(ctx context.Context, cartID, itemID string) error {
 	const query = `DELETE FROM cart_item WHERE cart_id = $1 AND id = $2`
 
@@ -53,6 +55,7 @@ func (c *CartItem) RemoveItemFromCart(ctx context.Context, cartID, itemID string
 	return nil
 }
 
+// TODO: same shit
 func (c *CartItem) ItemIsAvailable(ctx context.Context, id string) (bool, error) {
 	const checkItem = `SELECT id FROM cart_item WHERE id = $1`
 	result, err := c.DB.ExecContext(ctx, checkItem, id)
