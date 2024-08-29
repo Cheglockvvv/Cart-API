@@ -6,7 +6,7 @@ package mocks
 
 import (
 	context "context"
-	models "github.com/Cheglockvvv/Cart-API/app/internal/models"
+	models "github.com/Cheglockvvv/Cart-API/internal/models"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
