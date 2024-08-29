@@ -7,16 +7,16 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type cartEntity struct { //TODO: no entity - dto
-	ID    string           `db:"id"`
-	Items []cartItemEntity `db:"items"`
+type cartDTO struct {
+	id    string           `db:"id"`
+	items []cartItemEntity `db:"items"`
 }
 
 type Cart struct {
-	DB *sqlx.DB // TODO: switch to lowercase
+	DB *sqlx.DB // TODO: switch to lowercase and make getter btw
 }
 
-func NewCart(db *sqlx.DB) *Cart { // TODO: fsffsklfj
+func NewCart(db *sqlx.DB) *Cart {
 	cart := &Cart{DB: db}
 
 	return cart
@@ -28,8 +28,8 @@ func (c *Cart) CreateCart(ctx context.Context) (string, error) {
 	var id string
 	err := c.DB.QueryRowxContext(ctx, query).Scan(&id)
 	if err != nil {
-		return "", fmt.Errorf("c.DB.QueryRowx.Scan: %w", err)
-	} // TODO:
+		return "", fmt.Errorf("c.DB.QueryRowxContext.Scan: %w", err)
+	}
 
 	return id, nil
 }
@@ -45,7 +45,7 @@ func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) 
 	}
 	defer rows.Close()
 
-	cartEn := cartEntity{ID: id}
+	cartEn := cartDTO{id: id}
 
 	items := make([]cartItemEntity, 0)
 
@@ -64,7 +64,7 @@ func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) 
 		convertedItems[i] = cartItemConvert(items[i])
 	}
 
-	cart := models.Cart{ID: cartEn.ID, Items: convertedItems}
+	cart := models.Cart{ID: cartEn.id, Items: convertedItems}
 
 	return cart, nil
 }
