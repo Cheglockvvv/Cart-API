@@ -24,28 +24,28 @@ type Cart struct {
 	cartItemService CartItemService
 }
 
-type cartItemEntity struct { //TODO: dto switch
+type cartItemDTO struct {
 	ID       string `json:"id"`
 	CartID   string `json:"cart_id"`
 	Product  string `json:"product"`
 	Quantity int    `json:"quantity"`
 }
 
-type cartEntity struct { //TODO: dto switch
-	ID    string           `json:"id"`
-	Items []cartItemEntity `json:"items"`
+type cartEntityDTO struct {
+	ID    string        `json:"id"`
+	Items []cartItemDTO `json:"items"`
 }
 
 func NewCart(cartService CartService, cartItemService CartItemService) *Cart { // TODO: NewCart
 	return &Cart{cartService: cartService, cartItemService: cartItemService}
 }
 
-// TODO: remove or not
+// CreateCart
 // @Summary Create a new cart
 // @Description Creates a cart and returns it
 // @Tags Cart
 // @Produce json
-// @Success 200 {object} cartEntity
+// @Success 200 {object} cartEntityDTO
 // @Failure 500 "Internal Server Error"
 // @Router /cart [post]
 func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +57,7 @@ func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cart := cartEntity{ID: cartID, Items: []cartItemEntity{}}
+	cart := cartEntityDTO{ID: cartID, Items: []cartItemDTO{}}
 	err = json.NewEncoder(w).Encode(cart)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
@@ -65,14 +65,14 @@ func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// @Summary Add item to cart
+// AddItemToCart
 // @Description adds an item to a specified cart with provided details and returns it
 // @Tags CartItem
 // @Accept json
 // @Produce json
 // @Param id path string true "cart id"
 // @Param item body handler.AddItemToCart.request true "Item to add to cart"
-// @Success 200 {object} cartItemEntity
+// @Success 200 {object} cartItemDTO
 // @Failure 400 "Bad Request"
 // @Failure 422 "Unprocessable Entity"
 // @Failure 500 "Internal Server Error"
@@ -92,7 +92,7 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cartID := r.PathValue("id")
-	var parsedBody cartItemEntity
+	var parsedBody cartItemDTO
 	err := json.NewDecoder(r.Body).Decode(&parsedBody)
 	if err != nil {
 		http.Error(w, "", http.StatusInternalServerError)
@@ -125,6 +125,7 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// RemoveItemFromCart
 // @Summary Remove item from cart
 // @Description removes a specified item from a specified cart
 // @Tags CartItem
@@ -144,8 +145,8 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cartID := r.PathValue("cartID")
-	itemID := r.PathValue("itemID")
+	cartID := r.PathValue("cart_id")
+	itemID := r.PathValue("item_id")
 
 	err := c.cartItemService.RemoveItemFromCart(ctx, cartID, itemID)
 	if err != nil {
@@ -161,12 +162,13 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetCartByID
 // @Summary Get a cart by ID
 // @Description With specified CartID returns a cart
 // @Tags Cart
 // @Produce json
 // @Param id path string true "CartID"
-// @Success 200 {object} cartEntity
+// @Success 200 {object} cartEntityDTO
 // @Failure 400 "Bad Request"
 // @Failure 422 "Unprocessable Entity"
 // @Failure 500 "Internal Server Error"
@@ -204,8 +206,8 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func cartItemConvert(modelItem models.CartItem) cartItemEntity {
-	item := cartItemEntity{
+func cartItemConvert(modelItem models.CartItem) cartItemDTO {
+	item := cartItemDTO{
 		ID:       modelItem.ID,
 		CartID:   modelItem.CartID,
 		Product:  modelItem.Product,
@@ -215,13 +217,13 @@ func cartItemConvert(modelItem models.CartItem) cartItemEntity {
 	return item
 }
 
-func cartConvert(modelCart models.Cart) cartEntity {
-	cartItems := make([]cartItemEntity, len(modelCart.Items)) // TODO: to make with 0 and cap=len()
+func cartConvert(modelCart models.Cart) cartEntityDTO {
+	cartItems := make([]cartItemDTO, len(modelCart.Items)) // TODO: to make with 0 and cap=len()
 	for i, item := range modelCart.Items {
 		cartItems[i] = cartItemConvert(item)
 	}
 
-	cart := cartEntity{
+	cart := cartEntityDTO{
 		ID:    modelCart.ID,
 		Items: cartItems,
 	}
