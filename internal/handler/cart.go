@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/Cheglockvvv/Cart-API/internal/models"
+	"github.com/go-chi/chi"
 	"net/http"
 	"regexp"
 )
@@ -96,7 +97,7 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cartID := r.PathValue("id")
+	cartID := chi.URLParam(r, "id")
 	var parsedBody cartItemDTO
 	err := json.NewDecoder(r.Body).Decode(&parsedBody)
 	if err != nil {
@@ -149,8 +150,8 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cartID := r.PathValue("cart_id")
-	itemID := r.PathValue("item_id")
+	cartID := chi.URLParam(r, "cart_id")
+	itemID := chi.URLParam(r, "item_id")
 
 	err := c.cartItemService.RemoveItemFromCart(ctx, cartID, itemID)
 	if err != nil {
@@ -185,7 +186,7 @@ func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := r.PathValue("id")
+	id := chi.URLParam(r, "id")
 	cart, err := c.cartService.GetCartByID(ctx, id)
 
 	if err != nil {
