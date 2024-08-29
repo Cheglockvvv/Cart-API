@@ -36,9 +36,15 @@ type cartEntityDTO struct {
 	Items []cartItemDTO `json:"items"`
 }
 
-func NewCart(cartService CartService, cartItemService CartItemService) *Cart { // TODO: NewCart
+func NewCart(cartService CartService, cartItemService CartItemService) *Cart {
 	return &Cart{cartService: cartService, cartItemService: cartItemService}
 }
+
+var (
+	cartItemAdd    = regexp.MustCompile(`^/cart/[0-9]+/items/*$`)
+	cartItemRemove = regexp.MustCompile(`^/cart/[0-9]+/items/[0-9]+/*$`)
+	cartView       = regexp.MustCompile(`^/cart/[0-9]+/*$`)
+)
 
 // CreateCart
 // @Summary Create a new cart
@@ -78,15 +84,14 @@ func (c *Cart) CreateCart(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 "Internal Server Error"
 // @Router /cart/{id}/items [post]
 func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
-	type request struct { // TODO: Олег сказал, что самый пиздатый способ.!!!
+	type request struct {
 		Product  string `json:"product"`
 		Quantity int    `json:"quantity"`
 	}
 
 	ctx := r.Context()
 
-	cartAdd := regexp.MustCompile(`^/cart/[0-9]+/items/*$`) // TODO: move to global variable
-	if !cartAdd.MatchString(r.URL.Path) {
+	if !cartItemAdd.MatchString(r.URL.Path) {
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
@@ -139,8 +144,7 @@ func (c *Cart) AddItemToCart(w http.ResponseWriter, r *http.Request) {
 func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	cartRemove := regexp.MustCompile(`^/cart/[0-9]+/items/[0-9]+/*$`) // TODO: same
-	if !cartRemove.MatchString(r.URL.Path) {
+	if !cartItemRemove.MatchString(r.URL.Path) {
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
@@ -176,7 +180,6 @@ func (c *Cart) RemoveItemFromCart(w http.ResponseWriter, r *http.Request) {
 func (c *Cart) GetCartByID(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	cartView := regexp.MustCompile(`^/cart/[0-9]+/*$`) // TODO: same
 	if !cartView.MatchString(r.URL.Path) {
 		http.Error(w, "", http.StatusBadRequest)
 		return
