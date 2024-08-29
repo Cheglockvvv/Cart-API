@@ -3,21 +3,20 @@ package repository
 import (
 	"context"
 	"fmt"
-	models "github.com/Cheglockvvv/Cart-API/app/internal/models"
-	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/Cheglockvvv/Cart-API/internal/models"
 	"github.com/jmoiron/sqlx"
 )
 
-type cartEntity struct {
+type cartEntity struct { //TODO: no entity - dto
 	ID    string           `db:"id"`
 	Items []cartItemEntity `db:"items"`
 }
 
 type Cart struct {
-	DB *sqlx.DB
+	DB *sqlx.DB // TODO: switch to lowercase
 }
 
-func InitCart(db *sqlx.DB) *Cart {
+func NewCart(db *sqlx.DB) *Cart { // TODO: fsffsklfj
 	cart := &Cart{DB: db}
 
 	return cart
@@ -30,7 +29,7 @@ func (c *Cart) CreateCart(ctx context.Context) (string, error) {
 	err := c.DB.QueryRowxContext(ctx, query).Scan(&id)
 	if err != nil {
 		return "", fmt.Errorf("c.DB.QueryRowx.Scan: %w", err)
-	}
+	} // TODO:
 
 	return id, nil
 }
@@ -42,7 +41,7 @@ func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) 
 
 	rows, err := c.DB.QueryxContext(ctx, query, id)
 	if err != nil {
-		return models.Cart{}, fmt.Errorf("c.DB.Queryx: %w", err)
+		return models.Cart{}, fmt.Errorf("c.DB.QueryxContext: %w", err)
 	}
 	defer rows.Close()
 
@@ -56,11 +55,11 @@ func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) 
 
 		if err != nil {
 			return models.Cart{}, fmt.Errorf("rows.StructScan: %w", err)
-		}
+		} // TODO:
 		items = append(items, row)
 	}
 
-	convertedItems := make([]models.CartItem, len(items))
+	convertedItems := make([]models.CartItem, len(items)) // TODO: unnecessary allocations
 	for i := range items {
 		convertedItems[i] = cartItemConvert(items[i])
 	}
@@ -70,17 +69,17 @@ func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) 
 	return cart, nil
 }
 
-func (c *Cart) CartIsAvailable(ctx context.Context, id string) (bool, error) {
+func (c *Cart) CartIsAvailable(ctx context.Context, id string) (bool, error) { // TODO: rename to exists returns error
 
-	const checkCart = `SELECT id FROM cart WHERE id = $1`
-	result, err := c.DB.ExecContext(ctx, checkCart, id)
+	const query = `SELECT EXISTS(SELECT 1 FROM cart_item WHERE cart_id = $1)` // TODO: eбаааать
+	result, err := c.DB.ExecContext(ctx, query, id)
 	if err != nil {
 		return false, fmt.Errorf("c.DB.Exec: %w", err)
-	}
-	count, err := result.RowsAffected()
+	} // TODO:
+	count, err := result.RowsAffected() //TODO: remove
 	if err != nil {
 		return false, fmt.Errorf("result.RowsAffected: %w", err)
-	}
+	} // TODO:
 
 	if count != 1 {
 		return false, nil

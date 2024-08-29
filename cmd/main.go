@@ -39,7 +39,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cartRepository := repository.InitCart(db)         // TODO: switch to new
+	cartRepository := repository.NewCart(db)
 	cartItemRepository := repository.InitCartItem(db) // TODO: same
 
 	//err = migrations.Down(cartRepository.db)
