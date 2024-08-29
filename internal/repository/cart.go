@@ -22,7 +22,7 @@ func NewCart(db *sqlx.DB) *Cart {
 	return cart
 }
 
-func (c *Cart) CreateCart(ctx context.Context) (string, error) {
+func (c *Cart) Create(ctx context.Context) (string, error) {
 	const query = `INSERT INTO cart VALUES (DEFAULT) RETURNING id`
 
 	var id string
@@ -34,7 +34,7 @@ func (c *Cart) CreateCart(ctx context.Context) (string, error) {
 	return id, nil
 }
 
-func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) {
+func (c *Cart) Read(ctx context.Context, id string) (models.Cart, error) { // TODO: rename to read
 	const query = `SELECT ci.id, ci.cart_id, ci.product, ci.quantity 
 								FROM cart_item ci 
 								WHERE ci.cart_id = $1`
@@ -69,21 +69,14 @@ func (c *Cart) GetCartByID(ctx context.Context, id string) (models.Cart, error) 
 	return cart, nil
 }
 
-func (c *Cart) CartExists(ctx context.Context, id string) (bool, error) { // TODO: rename to exists returns error
+func (c *Cart) CartExists(ctx context.Context, id string) (bool, error) {
 
-	const query = `SELECT EXISTS(SELECT 1 FROM cart_item WHERE cart_id = $1)`
-	result, err := c.DB.ExecContext(ctx, query, id)
+	const query = `SELECT EXISTS(SELECT 1 FROM cart WHERE id = $1)`
+	var exists bool
+	err := c.DB.QueryRowxContext(ctx, query, id).Scan(&exists)
 	if err != nil {
-		return false, fmt.Errorf("c.DB.ExecContext: %w", err)
-	}
-	count, err := result.RowsAffected() //TODO: remove
-	if err != nil {
-		return false, fmt.Errorf("result.RowsAffected: %w", err)
-	} // TODO:
-
-	if count != 1 {
-		return false, nil
+		return false, fmt.Errorf("c.DB.QueryRowxContext.Scan: %w", err)
 	}
 
-	return true, nil
+	return exists, nil
 }
