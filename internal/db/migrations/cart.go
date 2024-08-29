@@ -14,7 +14,11 @@ func Up(db *sqlx.DB) error {
 	if err != nil {
 		return fmt.Errorf("initMigrator: %w", err)
 	}
-	m.Up()
+
+	err = m.Up()
+	if err != nil {
+		return fmt.Errorf("db is up to date: %w", err)
+	}
 
 	return nil
 }
@@ -24,7 +28,11 @@ func Down(db *sqlx.DB) error {
 	if err != nil {
 		return fmt.Errorf("initMigrator: %w", err)
 	}
-	m.Down()
+
+	err = m.Down()
+	if err != nil {
+		return fmt.Errorf("db is already down: %w", err)
+	}
 
 	return nil
 }
@@ -36,7 +44,7 @@ func initMigrator(db *sqlx.DB) (*migrate.Migrate, error) {
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		"file:///migrations",
+		"file:///cartApi/migrations", // TODO: via config
 		"postgres", driver)
 
 	if err != nil {
