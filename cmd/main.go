@@ -45,7 +45,7 @@ func main() {
 
 	err = migrations.Up(cartRepository.DB)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 
 	cartService := service.NewCart(cartRepository)
