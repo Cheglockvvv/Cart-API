@@ -1,24 +1,18 @@
-FROM golang:1.23-alpine AS builder
+FROM golang:1.22.5-alpine AS builder
 LABEL authors="cheglockvvv"
 
-WORKDIR /usr/local/src
+WORKDIR /app
 
-RUN apk --no-cache add bash
-
-# dependencies
-COPY ["go.mod", "go.sum", "./"]
-RUN go mod download
-
-# build
 COPY . .
-RUN go build -o ./bin/app app/cmd/main.go
+
+RUN go mod download
+RUN go build -o /app/xernia /app/cmd/main.go
 
 FROM alpine AS runner
 
-COPY --from=builder /usr/local/src/bin/app /
-COPY --from=builder /usr/local/src/.env /
-COPY --from=builder /usr/local/src/app/internal/db/migrations /migrations
+COPY --from=builder /app/xernia /cartApi/xernia
+COPY --from=builder /app/internal/db/migrations /cartApi/migrations
 
 EXPOSE ${API_PORT}
 
-CMD ["/app"]
+CMD ["/cartApi/xernia"]
