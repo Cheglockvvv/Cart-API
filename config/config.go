@@ -15,7 +15,7 @@ type DBConfig struct {
 	Host     string `env:"DB_HOST"`
 	Port     string `env:"DB_PORT"`
 	DBName   string `env:"DB_NAME"`
-	SSLMode  string `env:"SSL_MODE"`
+	SSLMode  string `env:"DB_SSL_MODE"`
 }
 
 type Cart struct {
