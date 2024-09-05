@@ -1,0 +1,35 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "postgres"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 2s
+      timeout: 2s
+      retries: 3
+
+  app:
+    build: .
+    container_name: cart_api
+    restart: unless-stopped
+    environment:
+      DB_USER: "root"
+      DB_PASSWORD: "password"
+      DB_NAME: "postgres"
+      DB_HOST: "postgres"
+      DB_PORT: "5432"
+      DB_SSL_MODE: "disable"
+      API_PORT: "8080"
+      API_MIGRATIONS_LOCATION: "/cartApi/migrations"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
