@@ -9,7 +9,6 @@ import (
 	"regexp"
 )
 
-// TODO: make tests че за хуйня
 type CartService interface {
 	CreateCart(context.Context) (string, error)
 	GetCartByID(context.Context, string) (models.Cart, error)
